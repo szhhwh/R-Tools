@@ -7,8 +7,8 @@ import { ref } from 'vue';
 const randnum = ref<number>();
 let recordtext = "学号抽取";
 
-let min: number = 1, max: number = 64, tiems: number = 1;
-let arry = [];
+let min: number = 1, max: number = 64, times: number = 1;
+let arry: any= [];
 
 function resest() {
     recordtext = "学号抽取";
@@ -17,7 +17,7 @@ function resest() {
 
 // Call Rust to give random number
 async function getnum() {
-    randnum.value = await invoke("generate_randnum", {min: min, max: max});
+    randnum.value = await invoke("generate_randnum", {min: min, max: max, condition: arry, times: times});
     
 }
 </script>
@@ -25,7 +25,7 @@ async function getnum() {
 <template>
     <div class="main container-fluid">
         <div class="text-center row">
-            <p class="display-1" id="text">{{ randnum + recordtext }}</p>
+            <p class="display-1" id="text">{{randnum}}</p>
             <p id="record" class="h4">已抽取学号</p>
         </div>
         <div class="num row">
@@ -39,7 +39,7 @@ async function getnum() {
             </div>
             <div class="col-4">
                 <p>抽取次数</p>
-                <input type="number" max="56" placeholder="抽取次数" class="text-center" id="frequency" v-model="tiems" />
+                <input type="number" max="56" placeholder="抽取次数" class="text-center" id="frequency" v-model="times" />
             </div>
         </div>
         <div>
