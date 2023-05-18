@@ -5,28 +5,35 @@ import "bootstrap/dist/js/bootstrap.js";
 import { ref } from 'vue';
 
 const randnum = ref<number>();
-let recordtext = "学号抽取";
+let recordtext: string;
 
 let min: number = 1, max: number = 64, times: number = 1;
-let arry: any= [];
+let record: any = [];
 
-function resest() {
+function reset() {
     recordtext = "学号抽取";
-    arry = [];
+    record = [];
 }
 
 // Call Rust to give random number
 async function getnum() {
-    randnum.value = await invoke("generate_randnum", {min: min, max: max, condition: arry, times: times});
-    
+    randnum.value = await invoke("generate_randnum", { min: min, max: max });
+    // return num
+}
+
+function match() {
+    let num = getnum();
+    while (record.includes(num)) {
+        num = getnum();
+    };
 }
 </script>
 
 <template>
     <div class="main container-fluid">
         <div class="text-center row">
-            <p class="display-1" id="text">{{randnum}}</p>
-            <p id="record" class="h4">已抽取学号</p>
+            <p class="display-1" id="text">{{ randnum }}</p>
+            <p id="record" class="h4">{{ record }}</p>
         </div>
         <div class="num row">
             <div class="col-4">
@@ -35,7 +42,7 @@ async function getnum() {
             </div>
             <div class="col-4">
                 <p>最大值</p>
-                <input type="number" placeholder="最大数字" class="text-center" id="max" v-model="max"/>
+                <input type="number" placeholder="最大数字" class="text-center" id="max" v-model="max" />
             </div>
             <div class="col-4">
                 <p>抽取次数</p>
@@ -44,7 +51,7 @@ async function getnum() {
         </div>
         <div>
             <button @click="getnum()">抽取</button>
-            <button onclick="reset()">重置</button>
+            <button @click="reset()">重置</button>
         </div>
     </div>
 </template>

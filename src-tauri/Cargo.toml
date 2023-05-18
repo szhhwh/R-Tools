@@ -22,11 +22,3 @@ rand = "0.8.5"
 # this feature is used for production builds or when `devPath` points to the filesystem
 # DO NOT REMOVE!!
 custom-protocol = ["tauri/custom-protocol"]
-
-[target.x86_64-pc-windows-msvc]
-linker = "lld"
-rustflags = [
-  "-Lnative=/home/username/.xwin/crt/lib/x86_64",
-  "-Lnative=/home/username/.xwin/sdk/lib/um/x86_64",
-  "-Lnative=/home/username/.xwin/sdk/lib/ucrt/x86_64"
-]
