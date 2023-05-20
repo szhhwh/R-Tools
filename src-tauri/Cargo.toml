@@ -1,5 +1,5 @@
 [package]
-name = "学号抽取器"
+name = "randapp"
 version = "0.0.1"
 description = "A Random App"
 authors = ["szhh"]
