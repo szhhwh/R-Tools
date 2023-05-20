@@ -7,7 +7,7 @@
     "withGlobalTauri": false
   },
   "package": {
-    "productName": "学号抽取器",
+    "productName": "randapp",
     "version": "0.0.1"
   },
   "tauri": {
@@ -28,7 +28,23 @@
         "icons/icon.ico"
       ],
       "identifier": "szhh.hr98.net",
-      "targets": "all"
+      "targets": "all",
+      "windows": {
+        "allowDowngrades": true,
+        "certificateThumbprint": null,
+        "digestAlgorithm": null,
+        "nsis": null,
+        "timestampUrl": null,
+        "tsp": false,
+        "webviewFixedRuntimePath": null,
+        "webviewInstallMode": {
+          "silent": true,
+          "type": "downloadBootstrapper"
+        },
+        "wix": {
+          "language": "zh-CN"
+        }
+      }
     },
     "security": {
       "csp": null
