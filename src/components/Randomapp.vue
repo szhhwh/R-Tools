@@ -57,11 +57,10 @@ reset()
 <template>
     <div class="main container-fluid">
         <div class="text-center row">
-            <p class="display-1" id="text">{{ tweened.number.toFixed(0) }}</p>
+            <p class="display-1">{{ tweened.number.toFixed(0) }}</p>
             <Transition>
-                <p v-if="show" class="h4">{{ output }}</p>
+                <p v-if="show" class="h3" id="output">{{ output }}</p>
             </Transition>
-            <!-- <p id="record" class="h4">{{ output }}</p> -->
         </div>
         <div class="num row">
             <div class="col-4">
@@ -127,5 +126,10 @@ button:hover {
     background-color: rgba(138, 138, 138, 0.233);
 
     transition: background-color 0.3s;
+}
+
+p{
+	word-wrap: break-word;
+	word-break: break-all;
 }
 </style>
