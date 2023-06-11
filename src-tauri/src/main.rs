@@ -20,7 +20,7 @@ fn generate_randnum() -> String {
         COUNT.fetch_add(1, Ordering::Relaxed);
         randlist(csv)
     } else {
-        String::from("123")
+        String::from("已穷尽")
     }
 }
 
