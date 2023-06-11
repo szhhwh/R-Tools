@@ -4,30 +4,27 @@ import { invoke } from '@tauri-apps/api/tauri';
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap/dist/js/bootstrap.js";
 import { reactive, ref, watch } from 'vue';
-//Gsap Animation
-import { gsap } from 'gsap';
 
 const randnum = ref();
 const output = ref();
 
 let min: number = 1, max: number = 64, times: number = 1;
-let record: number[] = [];
+let record: String[] = [];
 
 //Reset Func
 function reset() {
     randnum.value = "Rand";
     record = [];
+    invoke("reset")
 }
 
 //Give Randnumber
 async function getnum() {
-    if (record.length < (max - min)) {
-        for (var i = 0; i < times; i++) {
-            do {
-                randnum.value = await invoke("generate_randnum", { min: min, max: max });
-            } while (record.includes(randnum.value as number))
-            record.push(randnum.value as number)
-        }
+    for (var i = 0; i < times; i++) {
+        do {
+            randnum.value = await invoke("generate_randnum");
+        } while (record.includes(randnum.value as String))
+        record.push(randnum.value as String)
     }
 }
 
@@ -46,10 +43,6 @@ const tweened = reactive({
     number: 0
 })
 
-watch(randnum, (n) => {
-    gsap.to(tweened, { duration: 0.5, number: Number(n) || 0 })
-})
-
 //init
 reset()
 </script>
@@ -57,25 +50,13 @@ reset()
 <template>
     <div class="main container-fluid">
         <div class="text-center row">
-            <p class="display-1">{{ tweened.number.toFixed(0) }}</p>
+            <p class="display-1">{{ randnum }}</p>
             <Transition>
                 <p v-if="show" class="h3" id="output">{{ output }}</p>
             </Transition>
         </div>
-        <div class="num row">
-            <div class="col-4">
-                <p>最小值</p>
-                <input type="number" placeholder="最小数字" class="text-center" id="min" v-model="min" />
-            </div>
-            <div class="col-4">
-                <p>最大值</p>
-                <input type="number" placeholder="最大数字" class="text-center" id="max" v-model="max" />
-            </div>
-            <div class="col-4">
-                <p>抽取次数</p>
-                <input type="number" max="56" placeholder="抽取次数" class="text-center" id="frequency" v-model="times" />
-            </div>
-        </div>
+        <p>抽取次数</p>
+        <input type="number" max="56" placeholder="抽取次数" class="text-center" id="frequency" v-model="times" />
         <div>
             <button @click="getnum()">抽取</button>
             <button @click="reset()">重置</button>
@@ -105,11 +86,6 @@ reset()
     flex-direction: column;
 }
 
-.num {
-    margin: 20px 0;
-    display: flex;
-}
-
 input {
     border-radius: 2px;
 }
@@ -128,8 +104,8 @@ button:hover {
     transition: background-color 0.3s;
 }
 
-p{
-	word-wrap: break-word;
-	word-break: break-all;
+p {
+    word-wrap: break-word;
+    word-break: break-all;
 }
 </style>
