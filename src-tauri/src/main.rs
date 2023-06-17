@@ -27,17 +27,16 @@ lazy_static! {
 #[tauri::command]
 // generate_randnum
 fn generate_randnum(times: u32) -> String {
-    // For test
-    let temp = LIST.len();
-    println!("csv lenth = {temp}");
+    // counter
+    let mut count: u32 = 0;
     // 判断record是否为空，空数组则添加一个随机数
     if RECORD.lock().unwrap().is_empty() {
         let num = rand();
         RECORD.lock().unwrap().push(num);
-        return output();
+        count += 1;
     }
     // 进入生成循环
-    if LIST.len() > RECORD.lock().unwrap().len() {
+    if (LIST.len() > RECORD.lock().unwrap().len()) & (times > count) {
         let mut num; // 定义临时数字
         for _i in 1..=times {
             // 循环times次
@@ -72,10 +71,11 @@ fn output() -> String {
             Some(s) => s,
             None => process::exit(1),
         };
-        println!("{value}");
-        result.push_str(value)
+        if i >= 1 {
+            result.push_str(",")
+        }
+        result.push_str(value);
     }
-    println!("{result}");
     result
 }
 

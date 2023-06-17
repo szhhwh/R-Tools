@@ -9,27 +9,21 @@ const randnum = ref();
 const output = ref();
 
 let times: number = 1;
-let record: String[] = [];
 
 //Reset Func
 function reset() {
     invoke("reset")
     randnum.value = "Rand";
-    record = [];
+    output.value = "Hello Rand"
 }
 
 //Give Randnumber
 async function getnum() {
-    randnum.value = await invoke("generate_randnum",{times: times});
+    output.value = await invoke("generate_randnum",{times: times});
 }
 
-watch(randnum, () => {
-    if (record.length != 0) {
-        output.value = record.toString();
-    }
-    else {
-        output.value = "Hello Rand"
-    }
+watch(output, () => {
+    randnum.value = "Rand"
 })
 
 //Animation
