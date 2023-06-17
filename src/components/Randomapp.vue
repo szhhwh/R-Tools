@@ -8,24 +8,19 @@ import { reactive, ref, watch } from 'vue';
 const randnum = ref();
 const output = ref();
 
-let min: number = 1, max: number = 64, times: number = 1;
+let times: number = 1;
 let record: String[] = [];
 
 //Reset Func
 function reset() {
+    invoke("reset")
     randnum.value = "Rand";
     record = [];
-    invoke("reset")
 }
 
 //Give Randnumber
 async function getnum() {
-    for (var i = 0; i < times; i++) {
-        do {
-            randnum.value = await invoke("generate_randnum");
-        } while (record.includes(randnum.value as String))
-        record.push(randnum.value as String)
-    }
+    randnum.value = await invoke("generate_randnum",{times: times});
 }
 
 watch(randnum, () => {
