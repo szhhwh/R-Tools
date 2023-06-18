@@ -5,28 +5,27 @@ import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap/dist/js/bootstrap.js";
 import { reactive, ref, watch } from 'vue';
 
-const randnum = ref();
-const output = ref();
+const randnum_title = ref();
+const randlist = ref();
+const max_times = ref();
 
 let times: number = 1;
 
-//Reset Func
-function reset() {
+// Reset function
+async function reset() {
+    max_times.value = await invoke("return_list_number");
     invoke("reset")
-    randnum.value = "Rand";
-    output.value = "Hello Rand"
+    randnum_title.value = "Rand";
+    randlist.value = "Hello Rand"
 }
 
-//Give Randnumber
+// 抽取按钮
 async function getnum() {
-    output.value = await invoke("generate_randnum",{times: times});
+    randlist.value = await invoke("generate_randnum", { times: times });
+    randnum_title.value = await invoke("return_last_result");
 }
 
-watch(output, () => {
-    randnum.value = "Rand"
-})
-
-//Animation
+// Animation
 var show = ref(true);
 const tweened = reactive({
     number: 0
@@ -39,13 +38,14 @@ reset()
 <template>
     <div class="main container-fluid">
         <div class="text-center row">
-            <p class="display-1">{{ randnum }}</p>
+            <p class="display-1">{{ randnum_title }}</p>
             <Transition>
-                <p v-if="show" class="h3" id="output">{{ output }}</p>
+                <p v-if="show" class="h3" id="output">{{ randlist }}</p>
             </Transition>
         </div>
         <p>抽取次数</p>
-        <input type="number" max="56" placeholder="抽取次数" class="text-center" id="frequency" v-model="times" />
+        <input type="number" min="1" :max="max_times" placeholder="抽取次数" class="text-center" id="frequency"
+            v-model="times" />
         <div>
             <button @click="getnum()">抽取</button>
             <button @click="reset()">重置</button>
@@ -58,7 +58,7 @@ reset()
 /* Animation */
 .v-enter-active,
 .v-leave-active {
-    transition: opacity 0.5s ease;
+    transition: opacity 0.3s ease;
 }
 
 .v-enter-from,
