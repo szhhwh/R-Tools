@@ -1,17 +1,27 @@
 <script setup lang="ts">
+// tauri
 import { invoke } from '@tauri-apps/api/tauri';
-//bootstrap
+import { emit, listen } from '@tauri-apps/api/event';
+// bootstrap
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap/dist/js/bootstrap.js";
-import { reactive, ref, watch } from 'vue';
+// vue
+import { ref, onMounted } from 'vue';
 
 const randnum_title = ref();
 const randlist = ref();
 const max_times = ref();
-
 let times: number = 1;
 
-// Reset function
+// 抽取按钮
+async function getnum() {
+    await invoke("generate_randnum", { times: times });
+}
+
+// Animation 动画监听
+var show = ref(true); // 切换list显示动画
+
+// Reset function 重置按钮
 async function reset() {
     max_times.value = await invoke("return_list_number");
     invoke("reset")
@@ -19,20 +29,23 @@ async function reset() {
     randlist.value = "Hello Rand"
 }
 
-// 抽取按钮
-async function getnum() {
-    randlist.value = await invoke("generate_randnum", { times: times });
-    randnum_title.value = await invoke("return_last_result");
+async function list_listen() {
+    const listener = await listen("listoutput", (event: any)=>{
+        randlist.value = event.payload;
+    })
 }
 
-// Animation
-var show = ref(true);
-const tweened = reactive({
-    number: 0
-})
+async function randnum_title_listen() {
+    const listener = await listen("titleoutput",(event: any)=>{
+        randnum_title.value = event.payload
+    })
+}
 
-//init
-reset()
+onMounted(() => {
+    reset();
+    list_listen();
+    randnum_title_listen();
+})
 </script>
 
 <template>

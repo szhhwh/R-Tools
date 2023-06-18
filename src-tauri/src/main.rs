@@ -9,6 +9,7 @@ use rand::prelude::*;
 use std::collections::HashMap;
 use std::process;
 use std::sync::Mutex;
+use tauri::Manager;
 
 lazy_static! {
     // define global list object
@@ -26,7 +27,7 @@ lazy_static! {
 
 #[tauri::command]
 // generate_randnum
-fn generate_randnum(times: u32) -> String {
+fn generate_randnum(times: u32, app_handle: tauri::AppHandle) {
     let mut record = RECORD.lock().unwrap();
     // counter
     let mut count: u32 = 0;
@@ -46,7 +47,7 @@ fn generate_randnum(times: u32) -> String {
                     break;
                 }
                 num = rand(); // 获取随机数
-                // 判断num是否在record中，以及record的长度是否超出list的长度
+                              // 判断num是否在record中，以及record的长度是否超出list的长度
                 let temp1 = LIST.len() > record.len();
                 let temp2 = record.contains(&num);
                 if temp1 & temp2 {
@@ -60,6 +61,9 @@ fn generate_randnum(times: u32) -> String {
                 }
             }
         }
+    } else if LIST.len() == record.len() {
+        let _ = app_handle.emit_all("titleoutput", "列表抽取完毕");
+        return;
     }
     // 输出随机结果
     let mut result = String::new(); // result 输出Strings
@@ -70,20 +74,37 @@ fn generate_randnum(times: u32) -> String {
             None => {
                 println!("无法获取抽取记录vec");
                 process::exit(1);
-            },
+            }
         }) {
             Some(s) => s,
             None => {
                 println!("element con't find in list");
                 process::exit(1)
-            },
+            }
         };
         if i >= 1 {
             result.push_str(",")
         }
         result.push_str(value);
     }
-    result
+
+    let _ = app_handle.emit_all(
+        "titleoutput",
+        match LIST.get(match record.last() {
+            Some(e) => e,
+            None => {
+                println!("无法获取抽取记录vec");
+                process::exit(1);
+            }
+        }) {
+            Some(s) => String::from(s),
+            None => {
+                println!("element con't find in list");
+                process::exit(1)
+            }
+        },
+    );
+    let _ = app_handle.emit_all("listoutput", result);
 }
 
 fn rand() -> u32 {
@@ -105,27 +126,13 @@ fn return_list_number() -> u32 {
     LIST.len() as u32
 }
 
-#[tauri::command]
-fn return_last_result() -> String {
-    let record = RECORD.lock().unwrap();
-    match LIST.get(match record.last() {
-        Some(e) => e,
-        None => {
-            println!("无法获取抽取记录vec");
-            process::exit(1);
-        },
-    }) {
-        Some(s) => String::from(s),
-        None => {
-            println!("element con't find in list");
-            process::exit(1)
-        },
-    }
-}
-
 fn main() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![generate_randnum, reset, return_list_number, return_last_result])
+        .invoke_handler(tauri::generate_handler![
+            generate_randnum,
+            reset,
+            return_list_number
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
