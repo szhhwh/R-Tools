@@ -47,14 +47,13 @@ fn generate_randnum(times: u32, app_handle: tauri::AppHandle) {
         for _i in 1..=times {
             // 循环times次
             loop {
-                if times <= count {
+                if (times <= count) | (LIST.len() <= record.len()) {
                     break;
                 }
                 num = rand(); // 获取随机数
-                              // 判断num是否在record中，以及record的长度是否超出list的长度
-                let temp1 = LIST.len() > record.len();
-                let temp2 = record.contains(&num);
-                if temp1 & temp2 {
+                
+                // 判断num是否在record中，以及record的长度是否超出list的长度
+                if (LIST.len() > record.len()) & record.contains(&num) {
                     continue;
                 } else {
                     // push num into record
