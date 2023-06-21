@@ -24,23 +24,26 @@ var show = ref(true); // 切换list显示动画
 // Reset function 重置按钮
 async function reset() {
     max_times.value = await invoke("return_list_number");
-    invoke("reset")
+    invoke("reset"); // 调用rust重置函数
     randnum_title.value = "Rand";
-    randlist.value = "Hello Rand"
+    randlist.value = "Hello Rand";
 }
 
+// 下方抽取列表监听器
 async function list_listen() {
-    const listener = await listen("listoutput", (event: any)=>{
+    const listener = await listen("listoutput", (event: any) => {
         randlist.value = event.payload;
     })
 }
 
+// 标题监听器
 async function randnum_title_listen() {
-    const listener = await listen("titleoutput",(event: any)=>{
+    const listener = await listen("titleoutput", (event: any) => {
         randnum_title.value = event.payload
     })
 }
 
+// init 初始化
 onMounted(() => {
     reset();
     list_listen();
@@ -57,8 +60,7 @@ onMounted(() => {
             </Transition>
         </div>
         <p>抽取次数</p>
-        <input type="number" min="1" :max="max_times" placeholder="抽取次数" class="text-center" id="frequency"
-            v-model="times" />
+        <input type="number" min="1" :max="max_times" placeholder="抽取次数" class="text-center" v-model="times" />
         <div>
             <button @click="getnum()">抽取</button>
             <button @click="reset()">重置</button>

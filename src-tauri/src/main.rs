@@ -4,21 +4,24 @@
 #[macro_use]
 extern crate lazy_static;
 
-use csvread::{CONF, CSV};
 use rand::prelude::*;
 use std::collections::HashMap;
 use std::process;
 use std::sync::Mutex;
 use tauri::Manager;
 
+// 私有包
+use randapp::freader::csvreader;
+use randapp::config::g_config;
+
 lazy_static! {
     // define global list object
     static ref LIST: HashMap<u32, String> = {
-        let config = CONF::new().build().unwrap_or_else(|err| {
+        let config = g_config::CONF::new().build().unwrap_or_else(|err| {
             println!("err create global list object: {err}");
             process::exit(1)
         });
-        let csv = CSV::new().read(config.csv_path).unwrap();
+        let csv = csvreader::CSV::new().read(config.csv_path).unwrap();
         csv.list
     };
     // define global record object
@@ -29,7 +32,7 @@ lazy_static! {
 // generate_randnum
 fn generate_randnum(times: u32, app_handle: tauri::AppHandle) {
     let mut record = RECORD.lock().unwrap();
-    // counter
+    // counter 计数器
     let mut count: u32 = 0;
     // 判断record是否为空，空数组则添加一个随机数
     if record.is_empty() {
@@ -62,6 +65,7 @@ fn generate_randnum(times: u32, app_handle: tauri::AppHandle) {
             }
         }
     } else if LIST.len() == record.len() {
+        // 返回抽取完毕消息
         let _ = app_handle.emit_all("titleoutput", "列表抽取完毕");
         return;
     }
@@ -88,7 +92,7 @@ fn generate_randnum(times: u32, app_handle: tauri::AppHandle) {
         result.push_str(value);
     }
 
-    let _ = app_handle.emit_all(
+    let _ = app_handle.emit_all( // 返回大标题结果
         "titleoutput",
         match LIST.get(match record.last() {
             Some(e) => e,
@@ -104,7 +108,7 @@ fn generate_randnum(times: u32, app_handle: tauri::AppHandle) {
             }
         },
     );
-    let _ = app_handle.emit_all("listoutput", result);
+    let _ = app_handle.emit_all("listoutput", result);// 返回下方小字结果
 }
 
 fn rand() -> u32 {
