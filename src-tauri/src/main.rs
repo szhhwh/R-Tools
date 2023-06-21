@@ -14,6 +14,7 @@ use tauri::Manager;
 use randapp::freader::csvreader;
 use randapp::config::g_config;
 
+// 初始化全局变量
 lazy_static! {
     // define global list object
     static ref LIST: HashMap<u32, String> = {
