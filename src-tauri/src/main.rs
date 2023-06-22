@@ -87,7 +87,7 @@ fn generate_randnum(times: u32, app_handle: tauri::AppHandle) {
             }
         };
         if i >= 1 {
-            result.push_str(",")
+            result.push_str("，")
         }
         result.push_str(value);
     }

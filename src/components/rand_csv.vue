@@ -2,15 +2,13 @@
 // tauri
 import { invoke } from '@tauri-apps/api/tauri'
 import { listen } from '@tauri-apps/api/event'
-// bootstrap
-import "bootstrap/dist/css/bootstrap.css"
-import "bootstrap/dist/js/bootstrap.js"
 // vue
 import { ref, onMounted } from 'vue'
 
 const randnum_title = ref()
 const randlist = ref()
-const max_times = ref()
+const max = ref()
+const min = ref(1)
 let times: number = 1
 
 // 抽取按钮
@@ -18,12 +16,12 @@ async function getnum() {
     await invoke("generate_randnum", { times: times })
 }
 
-// Animation 动画监听
+// Animation 动画切换
 let show = ref(true) // 切换list显示动画
 
 // Reset function 重置按钮
 async function reset() {
-    max_times.value = await invoke("return_list_number")
+    max.value = await invoke("return_list_number")
     invoke("reset") // 调用rust重置函数
     randnum_title.value = "Rand"
     randlist.value = "Hello Rand"
@@ -52,25 +50,45 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="main container-fluid">
-        <div class="text-center row">
-            <p class="display-1">{{ randnum_title }}</p>
-            <Transition>
-                <p v-if="show" class="h3" id="output">{{ randlist }}</p>
-            </Transition>
-        </div>
-        <p>抽取次数</p>
-        <input type="number" min="1" :max="max_times" placeholder="抽取次数" class="text-center" v-model="times" />
-        <div>
-            <button @click="getnum()">抽取</button>
-            <button @click="reset()">重置</button>
-            <button @click="show = !show">显示已抽取</button>
-        </div>
-    </div>
+    <el-container>
+        <el-main>
+            <el-row justify="center">
+                <el-col>
+                    <p id="t-out">{{ randnum_title }}</p>
+                </el-col>
+                <el-col>
+                    <Transition>
+                        <p v-if="show" id="l-out">{{ randlist }}</p>
+                    </Transition>
+                </el-col>
+            </el-row>
+        </el-main>
+        <el-footer>
+            <el-row justify="center">
+                <el-text>抽取次数</el-text>
+                <el-input-number v-model="times" :min='min' :max="max" />
+            </el-row>
+            <el-row justify="center">
+                <el-button size="large" @click="getnum()">抽取</el-button>
+                <el-button size="large" @click="reset()">重置</el-button>
+            </el-row>
+            <el-row justify="center">
+                <el-switch v-model="show" active-text="打开列表显示" inactive-text="关闭列表显示"></el-switch>
+            </el-row>
+        </el-footer>
+    </el-container>
 </template>
 
 <style scoped>
-/* Animation */
+#t-out {
+    font-size: calc(10vmin);
+}
+
+#l-out {
+    font-size: calc(2.5vmin);
+}
+
+/* Animation Start */
 .v-enter-active,
 .v-leave-active {
     transition: opacity 0.3s ease;
@@ -80,35 +98,10 @@ onMounted(() => {
 .v-leave-to {
     opacity: 0;
 }
-
-/* Main css Start */
-.main {
-    height: 70vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-}
-
-input {
-    border-radius: 2px;
-}
-
-button {
-    width: 140px;
-    height: 50px;
-    border-radius: 5px;
-    background-color: white;
-    transition: background-color 0.3s;
-}
-
-button:hover {
-    background-color: rgba(138, 138, 138, 0.233);
-
-    transition: background-color 0.3s;
-}
+/* Animation End */
 
 p {
+    /* 段落自动换行 */
     word-wrap: break-word;
     word-break: break-all;
 }
