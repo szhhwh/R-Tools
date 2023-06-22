@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import Randomapp from "./components/Randomapp.vue";
+import Rand_csv from "./components/rand_csv.vue"
 </script>
 
 <template>
   <div class="container">
-    <Randomapp />
+    <Rand_csv />
   </div>
 </template>

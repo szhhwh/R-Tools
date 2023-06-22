@@ -12,7 +12,8 @@
   "dependencies": {
     "@tauri-apps/api": "^1.4.0",
     "gsap": "^3.11.5",
-    "vue": "^3.2.45"
+    "vue": "^3.2.45",
+    "vue-router": "^4.2.2"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^1.4.0",

@@ -1,38 +1,38 @@
 <script setup lang="ts">
 // tauri
-import { invoke } from '@tauri-apps/api/tauri';
-import { emit, listen } from '@tauri-apps/api/event';
+import { invoke } from '@tauri-apps/api/tauri'
+import { listen } from '@tauri-apps/api/event'
 // bootstrap
-import "bootstrap/dist/css/bootstrap.css";
-import "bootstrap/dist/js/bootstrap.js";
+import "bootstrap/dist/css/bootstrap.css"
+import "bootstrap/dist/js/bootstrap.js"
 // vue
-import { ref, onMounted } from 'vue';
+import { ref, onMounted } from 'vue'
 
-const randnum_title = ref();
-const randlist = ref();
-const max_times = ref();
-let times: number = 1;
+const randnum_title = ref()
+const randlist = ref()
+const max_times = ref()
+let times: number = 1
 
 // 抽取按钮
 async function getnum() {
-    await invoke("generate_randnum", { times: times });
+    await invoke("generate_randnum", { times: times })
 }
 
 // Animation 动画监听
-var show = ref(true); // 切换list显示动画
+let show = ref(true) // 切换list显示动画
 
 // Reset function 重置按钮
 async function reset() {
-    max_times.value = await invoke("return_list_number");
-    invoke("reset"); // 调用rust重置函数
-    randnum_title.value = "Rand";
-    randlist.value = "Hello Rand";
+    max_times.value = await invoke("return_list_number")
+    invoke("reset") // 调用rust重置函数
+    randnum_title.value = "Rand"
+    randlist.value = "Hello Rand"
 }
 
 // 下方抽取列表监听器
 async function list_listen() {
     const listener = await listen("listoutput", (event: any) => {
-        randlist.value = event.payload;
+        randlist.value = event.payload
     })
 }
 
@@ -45,9 +45,9 @@ async function randnum_title_listen() {
 
 // init 初始化
 onMounted(() => {
-    reset();
-    list_listen();
-    randnum_title_listen();
+    reset()
+    list_listen()
+    randnum_title_listen()
 })
 </script>
 
