@@ -1,7 +1,7 @@
-use thiserror::Error;
+// use thiserror::Error;
 
-#[derive(Debug, Error)]
-enum Error {
-    #[error("unknown error")]
-    Unknown,
-}
+// #[derive(Debug, Error)]
+// enum Error {
+//     #[error("unknown error")]
+//     Unknown,
+// }

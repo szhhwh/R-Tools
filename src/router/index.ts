@@ -13,7 +13,12 @@ const router = createRouter({
     {
       path: '/rand/csv',
       name: 'csvRand',
-      component: () => import('../views/csvRandView.vue') //延迟加载
+      component: () => import('../views/RandView.vue') //延迟加载
+    },
+    {
+      path: '/rand/csv/setting',
+      name: 'csvRand_setting',
+      component: () => import('../views/SettingView.vue')
     }
   ]
 })

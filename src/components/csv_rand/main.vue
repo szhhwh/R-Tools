@@ -13,16 +13,29 @@ let genbutton = ref(false)
 
 // 抽取按钮
 async function getnum() {
-    await invoke("generate_randnum", { times: times.value })
-        .catch((err) => {
-            genbutton.value = true
+    await invoke('init_list').then(
+        () => {
+            invoke("generate_randnum", { times: times.value })
+                .catch((err) => {
+                    genbutton.value = true
+                    ElNotification({
+                        title: 'Info',
+                        message: err,
+                        type: 'info',
+                        position: 'bottom-right'
+                    })
+                })
+        }
+    ).catch(
+        (err) => {
             ElNotification({
-                title: 'Info',
+                title: 'Error',
                 message: err,
-                type: 'info',
+                type: 'error',
                 position: 'bottom-right'
             })
-        })
+        }
+    )
 }
 
 // Animation 动画切换
@@ -30,11 +43,25 @@ let show = ref(true) // 切换list显示动画
 
 // Reset function 重置按钮
 async function reset() {
-    max.value = await invoke("return_list_number")
-    invoke("reset") // 调用rust重置函数
-    randnum_title.value = "Rand"
-    randlist.value = "Hello Rand"
-    genbutton.value = false
+    await invoke('init_list').then(
+        () => {
+            max.value = invoke("return_list_number")
+            invoke("reset") // 调用rust重置函数
+            randnum_title.value = "Rand"
+            randlist.value = "Hello Rand"
+            genbutton.value = false
+        }
+    ).catch(
+        (err) => {
+            ElNotification({
+                title: 'Error',
+                message: err,
+                type: 'error',
+                position: 'bottom-right'
+            })
+        }
+    )
+
 }
 
 // 下方抽取列表监听器

@@ -7,12 +7,15 @@ const activeIndex = ref('/rand/csv')
 
 <template>
   <el-container>
-    <!-- 导航菜单 -->
     <el-header>
+      <!-- 导航菜单 -->
       <el-menu :default-active=activeIndex class="el-menu-demo" mode="horizontal" :ellipsis="false" :router="true">
         <div class="flex-grow" />
-        <el-menu-item index="/rand/csv">csv_rand</el-menu-item>
-        <!-- <el-menu-item index="/">nor_rand</el-menu-item> -->
+        <el-menu-item index="/rand/csv">CSV 随机</el-menu-item>
+        <el-menu-item index="/rand/csv/setting">
+          <el-icon><Setting /></el-icon>
+          <span>设置</span>
+        </el-menu-item>
       </el-menu>
     </el-header>
     <!-- 组件渲染位置 -->
@@ -22,7 +25,7 @@ const activeIndex = ref('/rand/csv')
   </el-container>
 </template>
 
-<style>
+<style scoped>
 .main {
   height: 80vh;
 }

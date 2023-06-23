@@ -11,49 +11,71 @@ use std::sync::Mutex;
 use tauri::Manager;
 
 // 私有包
-use randapp::config::g_config;
+use randapp::config::appconfig;
 use randapp::freader::csvreader;
 
 // 初始化全局变量
 lazy_static! {
     // define global list object
-    static ref LIST: HashMap<u32, String> = {
-        let config = g_config::CONF::new().build().unwrap_or_else(|err| {
+    static ref LIST: Mutex<HashMap<u32, String>> = Mutex::new({
+        println!("load list");
+        let config = appconfig::CONF::new().build().unwrap_or_else(|err| {
             println!("err create global list object: {err}");
             process::exit(1)
         });
         let csv = csvreader::CSV::new().read(config.csv_path).unwrap();
         csv.list
-    };
+    });
     // define global record object
     static ref RECORD: Mutex<Vec<u32>> = Mutex::new(vec![]);
+}
+
+#[tauri::command]
+fn init_list() -> Result<(), String> {
+    match appconfig::CONF::new().build() {
+        Ok(c) => {
+            match csvreader::CSV::new().read(c.csv_path) {
+                Ok(_) => Ok(()),
+                Err(e) => {
+                    println!("init_error:{}", e);
+                    Err(String::from("csv 路径无效"))
+                }
+            }
+        },
+        Err(e) => {
+            println!("init_error:{}", e);
+            Err(String::from("config 读取失败"))
+        }
+    }
 }
 
 #[tauri::command]
 // generate_randnum
 fn generate_randnum(times: u32, app_handle: tauri::AppHandle) -> Result<(), String> {
     let mut record = RECORD.lock().unwrap();
+    let list = LIST.lock().unwrap();
+
     // counter 计数器
     let mut count: u32 = 0;
     // 判断record是否为空，空数组则添加一个随机数
     if record.is_empty() {
-        let num = rand();
+        let num = rand::thread_rng().gen_range(1..=list.len()) as u32;
         record.push(num);
         count += 1;
     }
     // 进入生成循环
-    if (LIST.len() > record.len()) & (times > count) {
+    if (list.len() > record.len()) & (times > count) {
         let mut num; // 定义临时数字
         for _i in 1..=times {
             // 循环times次
             loop {
-                if (times <= count) | (LIST.len() <= record.len()) {
+                if (times <= count) | (list.len() <= record.len()) {
                     break;
                 }
-                num = rand(); // 获取随机数
+                num = rand::thread_rng().gen_range(1..=list.len()) as u32; // 获取随机数
 
                 // 判断num是否在record中，以及record的长度是否超出list的长度
-                if (LIST.len() > record.len()) & record.contains(&num) {
+                if (list.len() > record.len()) & record.contains(&num) {
                     continue;
                 } else {
                     // push num into record
@@ -64,7 +86,7 @@ fn generate_randnum(times: u32, app_handle: tauri::AppHandle) -> Result<(), Stri
                 }
             }
         }
-    } else if LIST.len() == record.len() {
+    } else if list.len() == record.len() {
         // 返回抽取完毕消息
         return Err(String::from("列表抽取完毕"));
     }
@@ -72,7 +94,7 @@ fn generate_randnum(times: u32, app_handle: tauri::AppHandle) -> Result<(), Stri
     let mut result = String::new(); // result 输出Strings
     let lenth = record.len(); // 获取record长度
     for i in 0..lenth {
-        let value = match LIST.get(match record.get(i) {
+        let value = match list.get(match record.get(i) {
             Some(e) => e,
             None => {
                 println!("无法获取抽取记录vec");
@@ -94,7 +116,7 @@ fn generate_randnum(times: u32, app_handle: tauri::AppHandle) -> Result<(), Stri
     let _ = app_handle.emit_all(
         // 返回大标题结果
         "titleoutput",
-        match LIST.get(match record.last() {
+        match list.get(match record.last() {
             Some(e) => e,
             None => {
                 println!("无法获取抽取记录vec");
@@ -112,12 +134,8 @@ fn generate_randnum(times: u32, app_handle: tauri::AppHandle) -> Result<(), Stri
     Ok(())
 }
 
-fn rand() -> u32 {
-    rand::thread_rng().gen_range(1..=LIST.len() as u32)
-}
-
-#[tauri::command]
 // 重置
+#[tauri::command]
 fn reset() {
     let mut record = RECORD.lock().unwrap();
     let lenth = record.len();
@@ -128,9 +146,11 @@ fn reset() {
 
 #[tauri::command]
 fn return_list_number() -> u32 {
-    LIST.len() as u32
+    let list = LIST.lock().unwrap();
+    list.len() as u32
 }
 
+// splashscreen
 #[tauri::command]
 fn close_splashscreen(window: tauri::Window) {
     // Close splashscreen
@@ -147,7 +167,8 @@ fn main() {
             generate_randnum,
             reset,
             return_list_number,
-            close_splashscreen
+            close_splashscreen,
+            init_list
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
