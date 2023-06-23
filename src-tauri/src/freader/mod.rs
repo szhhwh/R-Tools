@@ -1,6 +1,5 @@
 pub mod csvreader {
     use std::collections::HashMap;
-    use std::error::Error;
     use std::fs;
 
     #[derive(Default)]
@@ -13,9 +12,9 @@ pub mod csvreader {
         pub fn new() -> Self {
             Default::default()
         }
-        pub fn read(&mut self, path: String) -> Result<Self, Box<dyn Error>> {
+        pub fn read(&mut self, path: String) -> Result<Self, std::io::Error> {
             // 从传入的路径中读取csv文件正文
-            let binding = fs::read_to_string(&path).expect("error read csvfile");
+            let binding = fs::read_to_string(&path)?;
             let content = binding.as_bytes();
             // 使用csv解析器解析csv
             let mut reader = csv::Reader::from_reader(content);

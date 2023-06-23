@@ -7,8 +7,7 @@
     "withGlobalTauri": false
   },
   "package": {
-    "productName": "randapp",
-    "version": "0.1.2"
+    "productName": "randapp"
   },
   "tauri": {
     "allowlist": {
@@ -54,11 +53,20 @@
     },
     "windows": [
       {
+        "label": "main",
         "fullscreen": false,
         "resizable": true,
         "title": "rand-app",
-        "width": 800,
-        "height": 600
+        "width": 1024,
+        "height": 720,
+        "visible": false
+      },
+      {
+        "label": "splashscreen",
+        "decorations": false,
+        "url": "splashscreen.html",
+        "height": 400,
+        "width": 400
       }
     ]
   }
