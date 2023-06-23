@@ -18,7 +18,7 @@ use randapp::freader::csvreader;
 lazy_static! {
     // define global list object
     static ref LIST: Mutex<HashMap<u32, String>> = Mutex::new({
-        println!("load list");
+        println!("初始化全局list变量");
         let config = appconfig::CONF::new().build().unwrap_or_else(|err| {
             println!("err create global list object: {err}");
             process::exit(1)

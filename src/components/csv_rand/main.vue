@@ -4,7 +4,7 @@ import { invoke } from '@tauri-apps/api/tauri'
 import { listen } from '@tauri-apps/api/event'
 // vue
 import { ref, onMounted } from 'vue'
-
+// element-plus
 import { ElNotification } from 'element-plus'
 
 const randnum_title = ref()

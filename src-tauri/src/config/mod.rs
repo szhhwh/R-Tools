@@ -3,7 +3,6 @@ pub mod appconfig {
     use rfd::FileDialog;
     use std::error::Error;
     use std::io;
-    use std::process;
 
     const CONF_NAME: &str = "conf.ini";
     const CONF_CSV_PATH_KEY: &str = "csv_path";
@@ -50,7 +49,7 @@ pub mod appconfig {
     }
 
     /// 调取rfd获取选择的csv文件路径并返回该路径
-    pub fn new_csvpath() -> Result<String, std::io::Error> {
+    pub fn new_csvpath() -> Result<String, String> {
         // 调用rfd库获取csv路径
         let csv_path = match FileDialog::new()
             .add_filter("csv file", &["csv"])
@@ -59,8 +58,8 @@ pub mod appconfig {
         {
             Some(p) => p,
             None => {
-                println!("Error get path");
-                process::exit(1)
+                println!("Problem get path");
+                return Err(String::from("路径为空或未选取文件"));
             }
         }
         .as_path()
