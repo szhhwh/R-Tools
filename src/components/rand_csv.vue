@@ -8,12 +8,21 @@ import { ref, onMounted } from 'vue'
 const randnum_title = ref()
 const randlist = ref()
 const max = ref()
-const min = ref(1)
-let times: number = 1
+let times = ref(1)
+let genbutton = ref(false)
 
 // 抽取按钮
 async function getnum() {
-    await invoke("generate_randnum", { times: times })
+    await invoke("generate_randnum", { times: times.value })
+        .catch((err) => {
+            genbutton.value = true
+            ElNotification({
+                title: 'Info',
+                message: err,
+                type: 'info',
+                position: 'bottom-right'
+            })
+        })
 }
 
 // Animation 动画切换
@@ -25,6 +34,7 @@ async function reset() {
     invoke("reset") // 调用rust重置函数
     randnum_title.value = "Rand"
     randlist.value = "Hello Rand"
+    genbutton.value = false
 }
 
 // 下方抽取列表监听器
@@ -66,10 +76,10 @@ onMounted(() => {
         <el-footer>
             <el-row justify="center">
                 <el-text>抽取次数</el-text>
-                <el-input-number v-model="times" :min='min' :max="max" />
+                <el-input-number v-model="times" :min="1" :max="max" />
             </el-row>
             <el-row justify="center">
-                <el-button size="large" @click="getnum()">抽取</el-button>
+                <el-button size="large" @click="getnum()" :disabled="genbutton">抽取</el-button>
                 <el-button size="large" @click="reset()">重置</el-button>
             </el-row>
             <el-row justify="center">
@@ -98,10 +108,11 @@ onMounted(() => {
 .v-leave-to {
     opacity: 0;
 }
+
 /* Animation End */
 
+/* 段落自动换行 */
 p {
-    /* 段落自动换行 */
     word-wrap: break-word;
     word-break: break-all;
 }

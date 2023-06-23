@@ -31,7 +31,7 @@ lazy_static! {
 
 #[tauri::command]
 // generate_randnum
-fn generate_randnum(times: u32, app_handle: tauri::AppHandle) {
+fn generate_randnum(times: u32, app_handle: tauri::AppHandle) -> Result<(), String> {
     let mut record = RECORD.lock().unwrap();
     // counter 计数器
     let mut count: u32 = 0;
@@ -66,8 +66,7 @@ fn generate_randnum(times: u32, app_handle: tauri::AppHandle) {
         }
     } else if LIST.len() == record.len() {
         // 返回抽取完毕消息
-        let _ = app_handle.emit_all("titleoutput", "列表抽取完毕");
-        return;
+        return Err(String::from("列表抽取完毕"));
     }
     // 输出随机结果
     let mut result = String::new(); // result 输出Strings
@@ -110,6 +109,7 @@ fn generate_randnum(times: u32, app_handle: tauri::AppHandle) {
         },
     );
     let _ = app_handle.emit_all("listoutput", result); // 返回下方小字结果
+    Ok(())
 }
 
 fn rand() -> u32 {
