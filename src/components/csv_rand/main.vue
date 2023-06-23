@@ -47,7 +47,9 @@ let show = ref(true) // 切换list显示动画
 async function reset() {
     await invoke('init_list').then(
         () => {
-            max.value = invoke("return_list_number")
+            invoke("return_list_number").then((len) => {
+                max.value = len
+            })
             invoke("reset") // 调用rust重置函数
             randnum_title.value = "Rand"
             randlist.value = "Hello Rand"
