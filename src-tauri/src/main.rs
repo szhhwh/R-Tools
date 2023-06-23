@@ -11,8 +11,8 @@ use std::sync::Mutex;
 use tauri::Manager;
 
 // 私有包
-use randapp::freader::csvreader;
 use randapp::config::g_config;
+use randapp::freader::csvreader;
 
 // 初始化全局变量
 lazy_static! {
@@ -51,7 +51,7 @@ fn generate_randnum(times: u32, app_handle: tauri::AppHandle) {
                     break;
                 }
                 num = rand(); // 获取随机数
-                
+
                 // 判断num是否在record中，以及record的长度是否超出list的长度
                 if (LIST.len() > record.len()) & record.contains(&num) {
                     continue;
@@ -92,7 +92,8 @@ fn generate_randnum(times: u32, app_handle: tauri::AppHandle) {
         result.push_str(value);
     }
 
-    let _ = app_handle.emit_all( // 返回大标题结果
+    let _ = app_handle.emit_all(
+        // 返回大标题结果
         "titleoutput",
         match LIST.get(match record.last() {
             Some(e) => e,
@@ -108,7 +109,7 @@ fn generate_randnum(times: u32, app_handle: tauri::AppHandle) {
             }
         },
     );
-    let _ = app_handle.emit_all("listoutput", result);// 返回下方小字结果
+    let _ = app_handle.emit_all("listoutput", result); // 返回下方小字结果
 }
 
 fn rand() -> u32 {
@@ -130,12 +131,23 @@ fn return_list_number() -> u32 {
     LIST.len() as u32
 }
 
+#[tauri::command]
+fn close_splashscreen(window: tauri::Window) {
+    // Close splashscreen
+    if let Some(splashscreen) = window.get_window("splashscreen") {
+        splashscreen.close().unwrap();
+    }
+    // Show main window
+    window.get_window("main").unwrap().show().unwrap();
+}
+
 fn main() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
             generate_randnum,
             reset,
-            return_list_number
+            return_list_number,
+            close_splashscreen
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

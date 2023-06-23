@@ -1,6 +1,6 @@
 [package]
 name = "randapp"
-version = "0.1.5"
+version = "0.1.6"
 description = "A Random App"
 authors = ["szhh"]
 license = ""
