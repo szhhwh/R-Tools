@@ -5,6 +5,8 @@ import { listen } from '@tauri-apps/api/event'
 // vue
 import { ref, onMounted } from 'vue'
 
+import { ElNotification } from 'element-plus'
+
 const randnum_title = ref()
 const randlist = ref()
 const max = ref()

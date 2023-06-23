@@ -11,7 +11,7 @@ use std::sync::Mutex;
 use tauri::Manager;
 
 // 私有包
-use randapp::config::appconfig;
+use randapp::config::appconfig::{self, new_csvpath};
 use randapp::freader::csvreader;
 
 // 初始化全局变量
@@ -161,6 +161,28 @@ fn close_splashscreen(window: tauri::Window) {
     window.get_window("main").unwrap().show().unwrap();
 }
 
+#[tauri::command]
+fn return_csv_path() -> Result<String, String> {
+    match appconfig::CONF::new().build() {
+        Ok(c) => Ok(c.csv_path),
+        Err(e) => {
+            println!("init_error:{}", e);
+            Err(String::from("csv 路径读取失败"))
+        }
+    }
+}
+
+#[tauri::command]
+fn reload_csv_path() -> Result<String, String> {
+    match new_csvpath() {
+        Ok(p) => Ok(p),
+        Err(e) => {
+            println!("err:{}", e);
+            Err(String::from("重新设置csv文件路径失败"))
+        }
+    }
+}
+
 fn main() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
@@ -168,7 +190,9 @@ fn main() {
             reset,
             return_list_number,
             close_splashscreen,
-            init_list
+            init_list,
+            return_csv_path,
+            reload_csv_path
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

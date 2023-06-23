@@ -49,8 +49,8 @@ pub mod appconfig {
         }
     }
 
-    // 调取rfd获取选择的csv路径并返回该路径
-    fn new_csvpath() -> Result<String, std::io::Error> {
+    /// 调取rfd获取选择的csv文件路径并返回该路径
+    pub fn new_csvpath() -> Result<String, std::io::Error> {
         // 调用rfd库获取csv路径
         let csv_path = match FileDialog::new()
             .add_filter("csv file", &["csv"])
