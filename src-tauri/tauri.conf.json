@@ -59,7 +59,14 @@
         "title": "rand-app",
         "width": 1024,
         "height": 720,
-        "visible": true
+        "visible": false
+      },
+      {
+        "label": "splashscreen",
+        "decorations": false,
+        "url": "splashscreen.html",
+        "height": 800,
+        "width": 800
       }
     ]
   }
