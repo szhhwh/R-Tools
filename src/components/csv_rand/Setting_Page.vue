@@ -30,7 +30,7 @@ async function reload_csv_path() {
     await invoke("reload_csv_path").then(
         (path) => {
             ElMessage({
-                message: '当前csv路径: ' + path,
+                message: '当前CSV路径: ' + path,
                 type: 'success',
             })
             get_csv_path()

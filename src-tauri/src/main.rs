@@ -33,13 +33,11 @@ lazy_static! {
 #[tauri::command]
 fn init_list() -> Result<(), String> {
     match appconfig::CONF::new().build() {
-        Ok(c) => {
-            match csvreader::CSV::new().read(c.csv_path) {
-                Ok(_) => Ok(()),
-                Err(e) => {
-                    println!("init_error:{}", e);
-                    Err(String::from("csv 路径无效"))
-                }
+        Ok(c) => match csvreader::CSV::new().read(c.csv_path) {
+            Ok(_) => Ok(()),
+            Err(e) => {
+                println!("init_error:{}", e);
+                Err(String::from("CSV 路径无效"))
             }
         },
         Err(e) => {
@@ -167,7 +165,7 @@ fn return_csv_path() -> Result<String, String> {
         Ok(c) => Ok(c.csv_path),
         Err(e) => {
             println!("init_error:{}", e);
-            Err(String::from("csv 路径读取失败"))
+            Err(String::from("CSV 路径读取失败"))
         }
     }
 }
@@ -175,10 +173,22 @@ fn return_csv_path() -> Result<String, String> {
 #[tauri::command]
 fn reload_csv_path() -> Result<String, String> {
     match new_csvpath() {
-        Ok(p) => Ok(p),
+        Ok(path) => {
+            let mut list = LIST.lock().unwrap();
+            *list = {
+                println!("初始化全局list变量");
+                let config = appconfig::CONF::new().build().unwrap_or_else(|err| {
+                    println!("err create global list object: {err}");
+                    process::exit(1)
+                });
+                let csv = csvreader::CSV::new().read(config.csv_path).unwrap();
+                csv.list
+            };
+            Ok(path)
+        },
         Err(e) => {
             println!("err:{}", e);
-            Err(String::from("重新设置csv文件路径失败"))
+            Err(String::from("重新设置CSV文件路径失败"))
         }
     }
 }
