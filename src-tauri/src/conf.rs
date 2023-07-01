@@ -1,19 +1,19 @@
-use log::{error, info};
+use log::{error, info, debug};
 use serde_json::Value;
-use std::{path::{PathBuf, Path}, collections::BTreeMap};
+use std::{path::PathBuf, collections::BTreeMap};
 // use tauri::{Manager, Theme};
 
 use crate::{app_root, exists, create_file};
 
-const CONF_NAME: &str = "conf.ini";
+const CONF_NAME: &str = "conf.json";
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
-pub struct AppConf<P: AsRef<Path>> {
+pub struct AppConf {
     /// CSV文件路径
-    pub csv_path: P,
+    pub csv_path: PathBuf,
 }
 
-impl<'a, P: AsRef<Path> + Default + serde::Serialize + serde::Deserialize<'a>> AppConf<P> {
+impl AppConf {
     pub fn new() -> Self {
         info!("config_init");
         Default::default()
@@ -58,6 +58,7 @@ impl<'a, P: AsRef<Path> + Default + serde::Serialize + serde::Deserialize<'a>> A
             info!("conf_create");
         }
         if let Ok(v) = serde_json::to_string_pretty(&self) {
+            debug!("Content: {}",&v);
             std::fs::write(path, v).unwrap_or_else(|err| {
                 error!("conf_write: {}", err);
                 Self::default().write();
@@ -70,6 +71,7 @@ impl<'a, P: AsRef<Path> + Default + serde::Serialize + serde::Deserialize<'a>> A
 
     /// 传入新的json正文，并更新结构体中的配置数据
     pub fn modify(self, json: Value) -> Self {
+        debug!("传入的json对象: {json}");
         // 将结构体转为json
         let config = serde_json::to_value(&self).unwrap();
         let mut config: BTreeMap<String, Value> = serde_json::from_value(config).unwrap();
@@ -84,8 +86,11 @@ impl<'a, P: AsRef<Path> + Default + serde::Serialize + serde::Deserialize<'a>> A
 
         // 将json对象反序列化为self
         match serde_json::to_string_pretty(&config) {
-            Ok(content) => match serde_json::from_str::<AppConf<P>>(&content) {
-                Ok(a) => a,
+            Ok(content) => match serde_json::from_str(&content) {
+                Ok(a) => {
+                    dbg!(&a);
+                    a
+                },
                 Err(err) => {
                     error!("config_modify_parse: {err}");
                     self

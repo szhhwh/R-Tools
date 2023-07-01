@@ -1,11 +1,11 @@
 use log::info;
 use randapp::conf::AppConf;
-use tauri::{App, command};
+use tauri::App;
 
-pub fn init(app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
+pub fn init(_app: &mut App) -> Result<(), Box<dyn std::error::Error>> {
     info!("app setup");
 
-    let app_config = AppConf::read();
+    let _app_config = AppConf::read().write();
 
     Ok(())
 }

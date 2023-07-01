@@ -1,3 +1,4 @@
+use log::{debug, error, info};
 use rand::prelude::*;
 use randapp::{conf::AppConf, exists};
 use std::collections::HashMap;
@@ -10,7 +11,7 @@ use crate::app::readers::csvreader;
 lazy_static! {
     // define global list object
     static ref LIST: Mutex<HashMap<u32, String>> = Mutex::new({
-        println!("初始化全局list变量");
+        debug!("初始化全局list变量");
         let config = AppConf::read();
         let csv = csvreader::CSV::new().read(config.csv_path).unwrap();
         csv.content
@@ -66,6 +67,7 @@ pub fn generate_randnum(times: u32, app_handle: tauri::AppHandle) -> Result<(), 
         }
     } else if list.len() == record.len() {
         // 返回抽取完毕消息
+        debug!("列表抽取完毕");
         return Err(String::from("列表抽取完毕"));
     }
     // 输出随机结果
@@ -75,13 +77,13 @@ pub fn generate_randnum(times: u32, app_handle: tauri::AppHandle) -> Result<(), 
         let value = match list.get(match record.get(i) {
             Some(e) => e,
             None => {
-                println!("无法获取抽取记录vec");
+                error!("无法获取抽取记录vec");
                 process::exit(1);
             }
         }) {
             Some(s) => s,
             None => {
-                println!("element con't find in list");
+                error!("element con't find in list");
                 process::exit(1)
             }
         };
@@ -97,18 +99,19 @@ pub fn generate_randnum(times: u32, app_handle: tauri::AppHandle) -> Result<(), 
         match list.get(match record.last() {
             Some(e) => e,
             None => {
-                println!("无法获取抽取记录vec");
+                error!("无法获取抽取记录vec");
                 process::exit(1);
             }
         }) {
             Some(s) => String::from(s),
             None => {
-                println!("element con't find in list");
+                error!("element con't find in list");
                 process::exit(1)
             }
         },
     );
-    let _ = app_handle.emit_all("listoutput", result); // 返回下方小字结果
+    info!("当前抽取结果: {result}");
+    let _ = app_handle.emit_all("listoutput", &result); // 返回下方小字结果
     Ok(())
 }
 
@@ -120,6 +123,7 @@ pub fn reset() {
     for _i in 0..lenth {
         record.swap_remove(0);
     }
+    debug!("重置CSVRand")
 }
 
 #[command]
@@ -128,36 +132,6 @@ pub fn return_list_number() -> u32 {
     list.len() as u32
 }
 
-#[command]
-pub fn return_csv_path() -> Result<String, String> {
-    match appconfig::CONF::new().build() {
-        Ok(c) => Ok(c.csv_path),
-        Err(e) => {
-            println!("init_error:{}", e);
-            Err(String::from("CSV 路径读取失败"))
-        }
-    }
-}
-
-#[command]
-pub fn reload_csv_path() -> Result<String, String> {
-    match new_csvpath() {
-        Ok(path) => {
-            let mut list = LIST.lock().unwrap();
-            *list = {
-                println!("初始化全局list变量");
-                let config = appconfig::CONF::new().build().unwrap_or_else(|err| {
-                    println!("err create global list object: {err}");
-                    process::exit(1)
-                });
-                let csv = csvreader::CSV::new().read(config.csv_path).unwrap();
-                csv.list
-            };
-            Ok(path)
-        }
-        Err(e) => {
-            println!("err:{}", e);
-            Err(String::from("重新设置CSV文件路径失败"))
-        }
-    }
-}
+// #[command]
+// pub fn return_csv_path() -> Result<String, String> {
+// }

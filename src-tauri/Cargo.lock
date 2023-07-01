@@ -2140,14 +2140,13 @@ dependencies = [
 
 [[package]]
 name = "randapp"
-version = "0.2.0"
+version = "0.3.1"
 dependencies = [
  "anyhow",
  "csv",
  "lazy_static",
  "log",
  "rand 0.8.5",
- "rfd",
  "serde",
  "serde_json",
  "tauri",
@@ -2726,6 +2725,7 @@ dependencies = [
  "rand 0.8.5",
  "raw-window-handle",
  "regex",
+ "rfd",
  "semver",
  "serde",
  "serde_json",

@@ -1,8 +1,7 @@
 use anyhow::Result;
-use log::info;
 use std::{
     fs,
-    path::{Path, PathBuf},
+    path::{Path, PathBuf}, ffi::OsStr,
 };
 
 pub mod conf;
@@ -13,15 +12,16 @@ pub mod error;
 /// 返回 **PathBuf**
 pub fn app_root() -> PathBuf {
     let path = tauri::api::path::home_dir().unwrap().join(".randapp");
-    info!("app_root path: {}", path.display());
     path
 }
 
 /// 判断传入的path是否存在
 ///
 /// 返回 **bool**
-pub fn exists(path: &Path) -> bool {
-    Path::new(path).exists()
+pub fn exists<P>(path: P) -> bool
+where P: AsRef<Path> + AsRef<OsStr>
+{
+    Path::new(&path).exists()
 }
 
 /// 创建文件
