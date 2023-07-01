@@ -21,7 +21,7 @@ async function getnum() {
                 .catch((err) => {
                     genbutton.value = true
                     ElNotification({
-                        title: 'Info',
+                        title: '信息',
                         message: err,
                         type: 'info',
                         position: 'bottom-right'
@@ -31,7 +31,7 @@ async function getnum() {
     ).catch(
         (err) => {
             ElNotification({
-                title: 'Error',
+                title: '错误',
                 message: err,
                 type: 'error',
                 position: 'bottom-right'
@@ -58,7 +58,7 @@ async function reset() {
     ).catch(
         (err) => {
             ElNotification({
-                title: 'Error',
+                title: '错误',
                 message: err,
                 type: 'error',
                 position: 'bottom-right'
