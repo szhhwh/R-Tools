@@ -9,6 +9,7 @@ const CONF_NAME: &str = "conf.ini";
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct AppConf<P: AsRef<Path>> {
+    /// CSV文件路径
     pub csv_path: P,
 }
 

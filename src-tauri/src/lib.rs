@@ -38,11 +38,3 @@ where
     fs::File::create(filename)?;
     Ok(())
 }
-
-/// tauri命令模块
-pub mod cmd {
-    use tauri::{command, AppHandle, Manager};
-
-    #[command]
-    pub fn generate_randnum() {}
-}

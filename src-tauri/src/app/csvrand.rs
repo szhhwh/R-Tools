@@ -29,7 +29,7 @@ pub fn init_list() -> Result<(), String> {
 
 #[command]
 /// 生成随机数
-fn generate_randnum(times: u32, app_handle: tauri::AppHandle) -> Result<(), String> {
+pub fn generate_randnum(times: u32, app_handle: tauri::AppHandle) -> Result<(), String> {
     let mut record = RECORD.lock().unwrap();
     let list = LIST.lock().unwrap();
 
@@ -114,7 +114,7 @@ fn generate_randnum(times: u32, app_handle: tauri::AppHandle) -> Result<(), Stri
 
 /// 重置
 #[command]
-fn reset() {
+pub fn reset() {
     let mut record = RECORD.lock().unwrap();
     let lenth = record.len();
     for _i in 0..lenth {
@@ -123,15 +123,13 @@ fn reset() {
 }
 
 #[command]
-fn return_list_number() -> u32 {
+pub fn return_list_number() -> u32 {
     let list = LIST.lock().unwrap();
     list.len() as u32
 }
 
-
-
 #[command]
-fn return_csv_path() -> Result<String, String> {
+pub fn return_csv_path() -> Result<String, String> {
     match appconfig::CONF::new().build() {
         Ok(c) => Ok(c.csv_path),
         Err(e) => {
@@ -142,7 +140,7 @@ fn return_csv_path() -> Result<String, String> {
 }
 
 #[command]
-fn reload_csv_path() -> Result<String, String> {
+pub fn reload_csv_path() -> Result<String, String> {
     match new_csvpath() {
         Ok(path) => {
             let mut list = LIST.lock().unwrap();
