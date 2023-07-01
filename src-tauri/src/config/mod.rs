@@ -21,9 +21,7 @@ pub mod appconfig {
         pub fn build(&self) -> Result<CONF, Box<dyn Error>> {
             // 尝试从默认文件中读取配置
             let config = match Ini::load_from_file(CONF_NAME) {
-                Ok(config) => {
-                    config
-                }
+                Ok(config) => config,
                 Err(_) => {
                     // 无法读取配置后尝试新建
                     println!("Can't find config file\nTry to create config file");
@@ -49,7 +47,7 @@ pub mod appconfig {
     }
 
     /// 调取rfd获取选择的csv文件路径并返回该路径
-    pub fn new_csvpath() -> Result<String, String> {
+    pub fn new_csvpath() -> Result<String, &'static str> {
         // 调用rfd库获取csv路径
         let csv_path = match FileDialog::new()
             .add_filter("csv file", &["csv"])
@@ -59,7 +57,7 @@ pub mod appconfig {
             Some(p) => p,
             None => {
                 println!("Problem get path");
-                return Err(String::from("路径为空或未选取文件"));
+                return Err("路径为空或未选取文件");
             }
         }
         .as_path()
@@ -71,7 +69,22 @@ pub mod appconfig {
         conf.with_section(Some(CONF_PATH_SECTION))
             .set(CONF_CSV_PATH_KEY, &csv_path);
         conf.write_to(&mut io::stdout()).unwrap();
-        conf.write_to_file(CONF_NAME).unwrap();
+
+        // 获取用户config文件夹
+        let user_config_path = match tauri::api::path::config_dir() {
+            None => {
+                println!("Problem get user's config_path");
+                return Err("13");
+            }
+            Some(path) => path,
+        }
+        .join("randapp")
+        .join("config.ini")
+        .as_path()
+        .display()
+        .to_string();
+        dbg!(&user_config_path);
+        conf.write_to_file(&user_config_path).unwrap();
 
         Ok(csv_path.to_string())
     }
