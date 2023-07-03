@@ -9,24 +9,59 @@ import { ElNotification } from 'element-plus'
 
 const randnum_title = ref()
 const randlist = ref()
+
+// 抽取参数
 const max = ref()
-let times = ref(1)
-let genbutton = ref(false)
+const times = ref(1)
+
+// Taggle 切换器
+const listshow = ref(true) // 切换list显示状态
+const animation = ref(false) // 切换动画使用
+const getbutton = ref(false) // 抽取按钮状态
+const resetbutton = ref(false) // 重置按钮状态
+let animation_lock: boolean = false //动画锁定
+
+// 动画定时器
+let motioninterv: any
 
 // 抽取按钮
 async function getnum() {
     await invoke('init_list').then(
         () => {
-            invoke("generate_randnum", { times: times.value })
-                .catch((err) => {
-                    genbutton.value = true
-                    ElNotification({
-                        title: '信息',
-                        message: err,
-                        type: 'info',
-                        position: 'bottom-right'
+            if (animation && animation_lock === false) {
+                animation_lock = true
+                resetbutton.value = true
+                motioninterv = setInterval(() => {
+                    invoke("return_randresult")
+                }, 100)
+            }
+            else if (animation && animation_lock === true) {
+                animation_lock = false
+                clearInterval(motioninterv)
+                invoke("generate_randnum", { times: times.value })
+                    .catch((err) => {
+                        getbutton.value = true
+                        ElNotification({
+                            title: '信息',
+                            message: err,
+                            type: 'info',
+                            position: 'bottom-right'
+                        })
                     })
-                })
+                resetbutton.value = false
+            }
+            else if (animation === ref(false) && animation_lock) {
+                invoke("generate_randnum", { times: times.value })
+                    .catch((err) => {
+                        getbutton.value = true
+                        ElNotification({
+                            title: '信息',
+                            message: err,
+                            type: 'info',
+                            position: 'bottom-right'
+                        })
+                    })
+            }
         }
     ).catch(
         (err) => {
@@ -40,9 +75,6 @@ async function getnum() {
     )
 }
 
-// Animation 动画切换
-let show = ref(true) // 切换list显示动画
-
 // Reset function 重置按钮
 async function reset() {
     await invoke('init_list').then(
@@ -53,7 +85,7 @@ async function reset() {
             invoke("reset") // 调用rust重置函数
             randnum_title.value = "Rand"
             randlist.value = "Hello Rand"
-            genbutton.value = false
+            getbutton.value = false
         }
     ).catch(
         (err) => {
@@ -99,7 +131,7 @@ onMounted(() => {
                 </el-col>
                 <el-col>
                     <Transition>
-                        <p v-if="show" id="l-out">{{ randlist }}</p>
+                        <p v-if="listshow" id="l-out">{{ randlist }}</p>
                     </Transition>
                 </el-col>
             </el-row>
@@ -110,11 +142,16 @@ onMounted(() => {
                 <el-input-number v-model="times" :min="1" :max="max" />
             </el-row>
             <el-row justify="center">
-                <el-button size="large" @click="getnum()" :disabled="genbutton">抽取</el-button>
-                <el-button size="large" @click="reset()">重置</el-button>
+                <el-button size="large" @click="getnum()" :disabled="getbutton">抽取</el-button>
+                <el-button size="large" @click="reset()" :disabled="resetbutton">重置</el-button>
             </el-row>
             <el-row justify="center">
-                <el-switch v-model="show" active-text="打开列表显示" inactive-text="关闭列表显示"></el-switch>
+                <el-col>
+                    <el-switch v-model="listshow" active-text="打开列表显示" inactive-text="关闭列表显示"></el-switch>
+                </el-col>
+                <el-col>
+                    <el-switch v-model="animation" active-text="打开动画" inactive-text="关闭动画"></el-switch>
+                </el-col>
             </el-row>
         </el-footer>
     </el-container>

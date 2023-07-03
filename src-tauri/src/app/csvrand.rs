@@ -1,6 +1,6 @@
 use log::{debug, error, info};
 use rand::prelude::*;
-use randapp::{conf::AppConf, exists};
+use rtools::{conf::AppConf, exists};
 use std::collections::HashMap;
 use std::process;
 use std::sync::Mutex;
@@ -21,16 +21,16 @@ lazy_static! {
 }
 
 #[command]
-pub fn init_list() -> Result<(), String> {
+pub fn init_list() -> Result<(), &'static str> {
     if let false = exists(AppConf::read().csv_path) {
-        return Err(String::from("CSV 路径无效"));
+        return Err("CSV 路径无效");
     }
     Ok(())
 }
 
 #[command]
 /// 生成随机数
-pub fn generate_randnum(times: u32, app_handle: tauri::AppHandle) -> Result<(), String> {
+pub fn generate_randnum(times: u32, app_handle: tauri::AppHandle) -> Result<(), &'static str> {
     let mut record = RECORD.lock().unwrap();
     let list = LIST.lock().unwrap();
 
@@ -68,7 +68,7 @@ pub fn generate_randnum(times: u32, app_handle: tauri::AppHandle) -> Result<(), 
     } else if list.len() == record.len() {
         // 返回抽取完毕消息
         debug!("列表抽取完毕");
-        return Err(String::from("列表抽取完毕"));
+        return Err("列表抽取完毕");
     }
     // 输出随机结果
     let mut result = String::new(); // result 输出Strings
@@ -78,13 +78,13 @@ pub fn generate_randnum(times: u32, app_handle: tauri::AppHandle) -> Result<(), 
             Some(e) => e,
             None => {
                 error!("无法获取抽取记录vec");
-                process::exit(1);
+                return Err("无法获取抽取记录vec")
             }
         }) {
             Some(s) => s,
             None => {
                 error!("element con't find in list");
-                process::exit(1)
+                return Err("element con't find in list")
             }
         };
         if i >= 1 {
@@ -115,7 +115,7 @@ pub fn generate_randnum(times: u32, app_handle: tauri::AppHandle) -> Result<(), 
     Ok(())
 }
 
-/// 重置
+/// 重置计时器
 #[command]
 pub fn reset() {
     let mut record = RECORD.lock().unwrap();
@@ -130,6 +130,24 @@ pub fn reset() {
 pub fn return_list_number() -> u32 {
     let list = LIST.lock().unwrap();
     list.len() as u32
+}
+
+#[command]
+pub fn return_randresult(app_handle: tauri::AppHandle) {
+    let list = LIST.lock().unwrap();
+    let num = rand::thread_rng().gen_range(1..=list.len()) as u32;
+
+    let _ = app_handle.emit_all(
+        // 返回大标题结果
+        "titleoutput",
+        match list.get(&num) {
+            Some(s) => String::from(s),
+            None => {
+                error!("element con't find in list");
+                process::exit(1)
+            }
+        },
+    );
 }
 
 // #[command]

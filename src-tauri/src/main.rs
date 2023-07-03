@@ -34,6 +34,7 @@ fn main() {
             csvrand::reset,
             csvrand::return_list_number,
             csvrand::init_list,
+            csvrand::return_randresult,
             // csvrand::return_csv_path,
             cmd::save_config,
             cmd::close_splashscreen,

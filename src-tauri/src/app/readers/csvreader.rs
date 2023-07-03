@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
-use randapp::error::AppError;
+use rtools::error::AppError;
 
 #[derive(Default)]
 pub struct CSV<P: AsRef<Path>> {

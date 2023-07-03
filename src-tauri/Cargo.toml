@@ -1,7 +1,7 @@
 [package]
-name = "randapp"
-version = "0.3.1"
-description = "A Random App"
+name = "rtools"
+version = "0.3.2"
+description = "A box that provides some useful tools"
 authors = ["szhh"]
 license = ""
 repository = ""

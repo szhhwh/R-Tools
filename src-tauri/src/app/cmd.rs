@@ -1,5 +1,5 @@
 use log::info;
-use randapp::conf::AppConf;
+use rtools::conf::AppConf;
 /// tauri命令模块
 use tauri::{command, Manager, AppHandle};
 
