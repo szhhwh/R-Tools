@@ -23,6 +23,8 @@ let animation_lock: boolean = false //动画锁定
 
 // 动画定时器
 let motioninterv: any
+// 动画速度
+const speed = ref(40)
 
 // 抽取按钮
 async function getnum() {
@@ -33,7 +35,7 @@ async function getnum() {
                 resetbutton.value = true
                 motioninterv = setInterval(() => {
                     invoke("return_randresult")
-                }, 100)
+                }, speed.value)
             }
             else if (animation.value == true && animation_lock === true) {
                 animation_lock = false
@@ -138,8 +140,12 @@ onMounted(() => {
         </el-main>
         <el-footer>
             <el-row justify="center">
-                <el-text>抽取次数</el-text>
-                <el-input-number v-model="times" :min="1" :max="max" />
+                <el-col>
+                    <el-text>抽取次数</el-text>
+                </el-col>
+                <el-col :span="12">
+                    <el-slider v-model="times" show-input :min="1" :max="max" />
+                </el-col>
             </el-row>
             <el-row justify="center">
                 <el-button size="large" @click="getnum()" :disabled="getbutton">抽取</el-button>
@@ -151,6 +157,9 @@ onMounted(() => {
                 </el-col>
                 <el-col>
                     <el-switch v-model="animation" active-text="打开动画" inactive-text="关闭动画"></el-switch>
+                </el-col>
+                <el-col :span="12">
+                    <ElText>动画间隔 (单位:ms)</ElText><el-slider v-model="speed" show-input :min="40" :max="100" />
                 </el-col>
             </el-row>
         </el-footer>
