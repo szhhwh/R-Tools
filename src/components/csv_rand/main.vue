@@ -28,14 +28,14 @@ let motioninterv: any
 async function getnum() {
     await invoke('init_list').then(
         () => {
-            if (animation && animation_lock === false) {
+            if (animation.value == true && animation_lock === false) {
                 animation_lock = true
                 resetbutton.value = true
                 motioninterv = setInterval(() => {
                     invoke("return_randresult")
                 }, 100)
             }
-            else if (animation && animation_lock === true) {
+            else if (animation.value == true && animation_lock === true) {
                 animation_lock = false
                 clearInterval(motioninterv)
                 invoke("generate_randnum", { times: times.value })
@@ -50,7 +50,7 @@ async function getnum() {
                     })
                 resetbutton.value = false
             }
-            else if (animation === ref(false) && animation_lock) {
+            else if (animation.value == false && animation_lock === false) {
                 invoke("generate_randnum", { times: times.value })
                     .catch((err) => {
                         getbutton.value = true

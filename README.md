@@ -1,4 +1,8 @@
-# Rand-app
+# R-Tools
+使用 `Tauri / Rust+Vue3+Element-Plus` 构建的小巧工具箱
+
+- CSVRand
+
 一个简单的随机数生成器
 可以随机输出CSV文件中的内容
 
@@ -8,5 +12,3 @@ number,title // 本行不会被读取，number必须取从1开始的自然数作
 1,something
 2,something  
 ```
-
-使用 `Tauri / Rust+Vue3+Element-Plus` 构建
