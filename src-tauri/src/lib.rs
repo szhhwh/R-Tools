@@ -11,7 +11,7 @@ pub mod error;
 ///
 /// 返回 **PathBuf**
 pub fn app_root() -> PathBuf {
-    let path = tauri::api::path::home_dir().unwrap().join(".randapp");
+    let path = tauri::api::path::home_dir().unwrap().join(".r-tools");
     path
 }
 

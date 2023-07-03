@@ -7,7 +7,7 @@
     "withGlobalTauri": false
   },
   "package": {
-    "productName": "R-Tools"
+    "productName": "r-tools"
   },
   "tauri": {
     "allowlist": {
@@ -67,7 +67,7 @@
         "label": "main",
         "fullscreen": false,
         "resizable": true,
-        "title": "rand-app",
+        "title": "R-tools",
         "width": 1024,
         "height": 720,
         "visible": false
