@@ -9,7 +9,9 @@ pub enum AppError {
     #[error("stdIOError:")]
     IO(#[from] std::io::Error),
     #[error("json")]
-    JsonIO(#[from] serde_json::error::Error)
+    JsonIO(#[from] serde_json::error::Error),
+    #[error("Unkown")]
+    Unkown(#[from] anyhow::Error)
 }
 
 impl From<String> for AppError {

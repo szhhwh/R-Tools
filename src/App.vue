@@ -1,8 +1,34 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
-import { ref } from 'vue';
+import { ref, provide, onMounted } from 'vue';
+import { invoke } from '@tauri-apps/api/tauri';
+import { ElNotification } from 'element-plus';
 
 const activeIndex = ref('/rand/csv')
+
+const config = ref()
+
+async function getconfig() {
+  await invoke('return_config').catch((err)=>{
+    ElNotification({
+      title: '错误',
+      type: 'error',
+      message: err,
+      position: 'bottom-right'
+    })
+  }).then((v)=>{
+    config.value = v
+    console.log(config.value)
+  })
+}
+
+provide('app_config', config)
+
+onMounted(
+  () => {
+    getconfig()
+  }
+)
 </script>
 
 <template>

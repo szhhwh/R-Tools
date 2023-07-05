@@ -149,7 +149,3 @@ pub fn return_randresult(app_handle: tauri::AppHandle) {
         },
     );
 }
-
-// #[command]
-// pub fn return_csv_path() -> Result<String, String> {
-// }

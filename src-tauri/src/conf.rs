@@ -3,10 +3,17 @@ use serde_json::Value;
 use std::{path::PathBuf, collections::BTreeMap};
 // use tauri::{Manager, Theme};
 
-use crate::{app_root, exists, create_file};
+use crate::{app_root, exists, create_file, error::AppError};
 
 const CONF_NAME: &str = "conf.json";
 
+/// APP的配置结构体
+/// 
+/// ```
+/// // 读取配置文件
+/// use rtools::conf::AppConf;
+/// AppConf::read();
+/// ```
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
 pub struct AppConf {
     /// CSV文件路径
@@ -50,23 +57,26 @@ impl AppConf {
     /// 写入配置文件
     /// # Error
     /// 若无法写入将在控制台报告错误并返回Self
-    pub fn write(self) -> Self {
+    pub fn write(self) -> Result<Self, AppError> {
         let path = &Self::file_path();
         // 判断路径是否存在
         if !exists(path) {
-            create_file(path).unwrap();
+            match create_file(path) {
+                Ok(_) => (),
+                Err(e) => return Err(AppError::Unkown(e))
+            }
             info!("conf_create");
         }
         if let Ok(v) = serde_json::to_string_pretty(&self) {
             debug!("Content: {}",&v);
             std::fs::write(path, v).unwrap_or_else(|err| {
                 error!("conf_write: {}", err);
-                Self::default().write();
+                Self::default().write().ok();
             });
         } else {
             error!("conf_ser");
         }
-        self
+        Ok(self)
     }
 
     /// 传入新的json正文，并更新结构体中的配置数据

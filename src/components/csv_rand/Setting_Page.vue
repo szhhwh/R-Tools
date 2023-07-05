@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 // vue
-import { onMounted, reactive } from 'vue';
+import { inject, onMounted, reactive, ref } from 'vue';
 // tauri
 import { invoke } from '@tauri-apps/api/tauri';
 import { open } from '@tauri-apps/api/dialog';
@@ -8,23 +8,6 @@ import { appConfigDir } from '@tauri-apps/api/path';
 // element-plus
 import { Check } from '@element-plus/icons-vue'
 import { ElMessage, ElNotification } from 'element-plus'
-
-async function get_csv_path() {
-    // await invoke("return_csv_path").then(
-    //     (path) => {
-    //         csvpath.value = path
-    //     }
-    // ).catch(
-    //     (err) => {
-    //         ElNotification({
-    //             title: 'Error',
-    //             message: err,
-    //             type: 'error',
-    //             position: 'bottom-right'
-    //         })
-    //     }
-    // )
-}
 
 // 重新加载CSV文件
 const reload_csv_path =
@@ -50,7 +33,7 @@ const reload_csv_path =
         } else {
             // user selected a single file
             console.log("选择的文件路径", selected)
-            form.csv_path = selected.toString()
+            form.value = { csv_path: selected.toString() }
             ElMessage({
                 message: '成功获取CSV文件路径',
                 type: 'success'
@@ -58,16 +41,22 @@ const reload_csv_path =
             let data = JSON.parse(JSON.stringify(form))
             console.log(data)
             await invoke('save_config', { data: data, label: 'main' })
+            getconfig()
         }
     }
 
-const form = reactive({
+const form = ref({
     csv_path: ""
 })
 
+function getconfig() {
+    let config: any = inject('app_config')
+    form.value = { csv_path: config.value.csv_path }
+}
+
 onMounted(
     () => {
-        get_csv_path()
+        getconfig()
     }
 )
 </script>

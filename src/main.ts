@@ -10,7 +10,7 @@ import 'element-plus/dist/index.css'
 // 注册 Element icons
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 
-// splashscreen
+// plashscreen
 document.addEventListener('DOMContentLoaded', () => {
     invoke('close_splashscreen')
 })
