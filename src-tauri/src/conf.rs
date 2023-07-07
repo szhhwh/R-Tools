@@ -112,4 +112,8 @@ impl AppConf {
             }
         }
     }
+
+    pub fn to_json(self) -> Result<Value, AppError> {
+        Ok(serde_json::to_value(self)?)
+    }
 }

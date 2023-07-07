@@ -38,7 +38,7 @@ const reload_csv_path =
                 message: '成功获取CSV文件路径',
                 type: 'success'
             })
-            let data = JSON.parse(JSON.stringify(form))
+            let data = JSON.parse(JSON.stringify(form.value))
             console.log(data)
             await invoke('save_config', { data: data, label: 'main' })
             getconfig()
