@@ -9,19 +9,20 @@ const activeIndex = ref('/rand/csv')
 const config = ref()
 
 async function getconfig() {
-  await invoke('return_config').catch((err)=>{
+  await invoke('return_config').catch((err) => {
     ElNotification({
       title: '错误',
       type: 'error',
       message: err,
       position: 'bottom-right'
     })
-  }).then((v)=>{
+  }).then((v) => {
     config.value = v
     console.log(config.value)
   })
 }
 
+// 向下级组件透穿config
 provide('app_config', config)
 
 onMounted(
@@ -39,14 +40,20 @@ onMounted(
         <div class="flex-grow" />
         <el-menu-item index="/rand/csv">CSV 随机</el-menu-item>
         <el-menu-item index="/rand/csv/setting">
-          <el-icon><Setting /></el-icon>
+          <el-icon>
+            <Setting />
+          </el-icon>
           <span>设置</span>
         </el-menu-item>
       </el-menu>
     </el-header>
     <!-- 组件渲染位置 -->
     <el-main class="main">
-      <RouterView />
+      <router-view v-slot="{ Component }">
+          <keep-alive>
+            <component :is="Component"></component>
+          </keep-alive>
+      </router-view>
     </el-main>
   </el-container>
 </template>

@@ -1,7 +1,7 @@
-use log::{info, error};
+use log::{error, info};
 use rtools::conf::AppConf;
 /// tauri命令模块
-use tauri::{command, Manager, AppHandle};
+use tauri::{command, AppHandle, Manager};
 
 /// close_splashscreen | 关闭 splashscreen
 #[command]
@@ -30,11 +30,11 @@ pub fn save_config(_app: AppHandle, data: serde_json::Value) -> Result<(), &'sta
 /// 向前端返回config
 #[command]
 pub fn return_config() -> Result<serde_json::Value, &'static str> {
-    let config = match serde_json::to_value(AppConf::read()) {
+    let config = match AppConf::read().to_json() {
         Ok(v) => v,
         Err(a) => {
             error!("无法读取本地配置 {}", a);
-            return Err("无法读取本地配置")
+            return Err("无法读取本地配置");
         }
     };
     Ok(config)

@@ -113,6 +113,10 @@ impl AppConf {
         }
     }
 
+    /// 将结构体转为json
+    /// 
+    /// # Error
+    /// 返回 *Result<Value, AppError>*
     pub fn to_json(self) -> Result<Value, AppError> {
         Ok(serde_json::to_value(self)?)
     }
