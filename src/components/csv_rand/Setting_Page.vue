@@ -1,8 +1,7 @@
 <script lang="ts" setup>
 // vue
-import { inject, onMounted, reactive, ref } from 'vue';
+import { inject, onMounted, ref } from 'vue';
 // tauri
-import { invoke } from '@tauri-apps/api/tauri';
 import { open } from '@tauri-apps/api/dialog';
 import { appConfigDir } from '@tauri-apps/api/path';
 // element-plus
@@ -25,9 +24,9 @@ const reload_csv_path =
         if (selected === null) {
             // user cancelled the selection
             ElNotification({
-                title: '错误',
+                title: '警告',
                 message: '未选择文件',
-                type: 'error',
+                type: 'warning',
                 position: 'bottom-right'
             })
         } else {
@@ -38,27 +37,22 @@ const reload_csv_path =
                 message: '成功获取CSV文件路径',
                 type: 'success'
             })
-            let data = JSON.parse(JSON.stringify(form.value))
-            console.log(data)
-            await invoke('save_config', { data: data, label: 'main' })
-            getconfig()
+            let data: JSON = JSON.parse(JSON.stringify(form.value))
+            write_conf(data, 'main')
         }
     }
 
+// 设置表单
 const form = ref({
     csv_path: ""
 })
 
-function getconfig() {
-    let config: any = inject('app_config')
-    form.value = { csv_path: config.value.csv_path }
-}
+// 注入全局配置
+const { config, write_conf } = inject<any>('app_config')
 
-onMounted(
-    () => {
-        getconfig()
-    }
-)
+onMounted(() => {
+    form.value = { csv_path: config.value.csv_path }
+})
 </script>
 
 <template>

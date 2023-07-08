@@ -7,8 +7,6 @@ const router = createRouter({
     {
       path: '/',
       redirect: '/rand/csv'
-      // name: 'home',
-      // component: HomeView
     },
     {
       path: '/rand/csv',

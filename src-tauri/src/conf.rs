@@ -1,20 +1,20 @@
-use log::{error, info, debug};
+use log::{debug, error, info, warn};
 use serde_json::Value;
-use std::{path::PathBuf, collections::BTreeMap};
+use std::{collections::BTreeMap, path::PathBuf};
 // use tauri::{Manager, Theme};
 
-use crate::{app_root, exists, create_file, error::AppError};
+use crate::{app_root, create_file, error::AppError, exists};
 
 const CONF_NAME: &str = "conf.json";
 
 /// APP的配置结构体
-/// 
+///
 /// ```
 /// // 读取配置文件
 /// use rtools::conf::AppConf;
 /// AppConf::read();
 /// ```
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Default)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct AppConf {
     /// CSV文件路径
     pub csv_path: PathBuf,
@@ -22,12 +22,23 @@ pub struct AppConf {
     // CSVRand界面参数
     pub csv_animation: bool,
     pub csv_animation_speed: i32,
-    pub csv_list: bool
+    pub csv_list: bool,
+}
+
+impl Default for AppConf {
+    fn default() -> Self {
+        Self {
+            csv_path: "".into(),
+            csv_animation: false,
+            csv_animation_speed: 40,
+            csv_list: true,
+        }
+    }
 }
 
 impl AppConf {
     pub fn new() -> Self {
-        info!("config_init");
+        warn!("config_init");
         Default::default()
     }
 
@@ -37,9 +48,9 @@ impl AppConf {
     }
 
     /// 读取配置文件
-    /// 
+    ///
     /// 返回包含配置的 **AppConf** 对象
-    /// 
+    ///
     /// # Error
     /// 无法读取配置文件时将返回包含**默认配置**的 AppConf 对象
     pub fn read() -> Self {
@@ -68,12 +79,12 @@ impl AppConf {
         if !exists(path) {
             match create_file(path) {
                 Ok(_) => (),
-                Err(e) => return Err(AppError::Unkown(e))
+                Err(e) => return Err(AppError::Unkown(e)),
             }
             info!("conf_create");
         }
         if let Ok(v) = serde_json::to_string_pretty(&self) {
-            debug!("Content: {}",&v);
+            debug!("Config context: {}", &v);
             std::fs::write(path, v).unwrap_or_else(|err| {
                 error!("conf_write: {}", err);
                 Self::default().write().ok();
@@ -95,7 +106,7 @@ impl AppConf {
         let new_config: BTreeMap<String, Value> = serde_json::from_value(json).unwrap();
 
         // 遍历新的json并将其赋值给config
-        for (k,v) in new_config {
+        for (k, v) in new_config {
             config.insert(k, v);
         }
 
@@ -105,12 +116,12 @@ impl AppConf {
                 Ok(a) => {
                     dbg!(&a);
                     a
-                },
+                }
                 Err(err) => {
                     error!("config_modify_parse: {err}");
                     self
                 }
-            }
+            },
             Err(err) => {
                 error!("config_modify_str: {err}");
                 self
@@ -119,7 +130,7 @@ impl AppConf {
     }
 
     /// 将结构体转为json
-    /// 
+    ///
     /// # Error
     /// 返回 *Result<Value, AppError>*
     pub fn to_json(self) -> Result<Value, AppError> {

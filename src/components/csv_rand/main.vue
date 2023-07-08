@@ -3,9 +3,9 @@
 import { invoke } from '@tauri-apps/api/tauri'
 import { listen } from '@tauri-apps/api/event'
 // vue
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, inject, watch, Ref } from 'vue'
 // element-plus
-import { ElNotification } from 'element-plus'
+import { ElNotification, ElMessage } from 'element-plus'
 
 const randnum_title = ref()
 const randlist = ref()
@@ -15,29 +15,35 @@ const max = ref()
 const times = ref(1)
 
 // Taggle 切换器
-const listshow = ref(true) // 切换list显示状态
-const animation = ref(false) // 切换动画使用
 const getbutton = ref(false) // 抽取按钮状态
 const resetbutton = ref(false) // 重置按钮状态
+const setting_box = ref(false) // 设置抽屉
 let animation_lock: boolean = false //动画锁定
+
+const Taggles = ref({
+    csv_list: true,
+    csv_animation: false,
+    csv_animation_speed: 40
+})
 
 // 动画定时器
 let motioninterv: any
-// 动画速度
-const speed = ref(40)
+
+const { config, write_conf } = inject<any>('app_config')
+
 
 // 抽取按钮
 async function getnum() {
     await invoke('init_list').then(
         () => {
-            if (animation.value == true && animation_lock === false) {
+            if (Taggles.value.csv_animation == true && animation_lock === false) {
                 animation_lock = true
                 resetbutton.value = true
                 motioninterv = setInterval(() => {
                     invoke("return_randresult")
-                }, speed.value)
+                }, Taggles.value.csv_animation_speed)
             }
-            else if (animation.value == true && animation_lock === true) {
+            else if (Taggles.value.csv_animation == true && animation_lock === true) {
                 animation_lock = false
                 clearInterval(motioninterv)
                 invoke("generate_randnum", { times: times.value })
@@ -52,7 +58,7 @@ async function getnum() {
                     })
                 resetbutton.value = false
             }
-            else if (animation.value == false && animation_lock === false) {
+            else if (Taggles.value.csv_animation == false && animation_lock === false) {
                 invoke("generate_randnum", { times: times.value })
                     .catch((err) => {
                         getbutton.value = true
@@ -118,9 +124,26 @@ async function randnum_title_listen() {
 
 // init 初始化
 onMounted(() => {
+    // 读取全局配置
+    Taggles.value.csv_animation = config.value.csv_animation
+    Taggles.value.csv_list = config.value.csv_list
+    Taggles.value.csv_animation_speed = config.value.csv_animation_speed
+    // 重置
     reset()
+    // 监听器
     list_listen()
     randnum_title_listen()
+    // 侦听器
+    watch(Taggles.value, async () => {
+        let data = JSON.parse(JSON.stringify(Taggles.value))
+        await write_conf(data, 'main').then(
+            ElMessage({
+                message: '设置已保存',
+                type: 'success',
+                grouping: true
+            })
+        )
+    })
 })
 </script>
 
@@ -133,7 +156,7 @@ onMounted(() => {
                 </el-col>
                 <el-col>
                     <Transition>
-                        <p v-if="listshow" id="l-out">{{ randlist }}</p>
+                        <p v-if="Taggles.csv_list" id="l-out">{{ randlist }}</p>
                     </Transition>
                 </el-col>
             </el-row>
@@ -152,15 +175,21 @@ onMounted(() => {
                 <el-button size="large" @click="reset()" :disabled="resetbutton">重置</el-button>
             </el-row>
             <el-row justify="center">
-                <el-col>
-                    <el-switch v-model="listshow" active-text="打开列表显示" inactive-text="关闭列表显示"></el-switch>
-                </el-col>
-                <el-col>
-                    <el-switch v-model="animation" active-text="打开动画" inactive-text="关闭动画"></el-switch>
-                </el-col>
-                <el-col :span="12">
-                    <ElText>动画间隔 (单位:ms)</ElText><el-slider v-model="speed" show-input :min="40" :max="100" />
-                </el-col>
+                <ElDrawer v-model="setting_box" :with-header="false" :size="'45%'">
+                    <el-row justify="center">
+                        <el-col>
+                            <el-switch v-model="Taggles.csv_list" active-text="打开列表显示" inactive-text="关闭列表显示"></el-switch>
+                        </el-col>
+                        <el-col>
+                            <el-switch v-model="Taggles.csv_animation" active-text="打开动画" inactive-text="关闭动画"></el-switch>
+                        </el-col>
+                        <el-col :span="12">
+                            <ElText>动画间隔 (单位:ms)</ElText><el-slider v-model="Taggles.csv_animation_speed" show-input
+                                :min="40" :max="100" />
+                        </el-col>
+                    </el-row>
+                </ElDrawer>
+                <ElButton @click="setting_box = true">其他设置</ElButton>
             </el-row>
         </el-footer>
     </el-container>
