@@ -18,6 +18,11 @@ const CONF_NAME: &str = "conf.json";
 pub struct AppConf {
     /// CSV文件路径
     pub csv_path: PathBuf,
+
+    // CSVRand界面参数
+    pub csv_animation: bool,
+    pub csv_animation_speed: i32,
+    pub csv_list: bool
 }
 
 impl AppConf {

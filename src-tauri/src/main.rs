@@ -10,7 +10,7 @@ use tauri_plugin_log::{
 };
 
 mod app;
-use app::{setup, csvrand, cmd};
+use app::{cmd, csvrand, setup, menu};
 
 fn main() {
     let mut log = tauri_plugin_log::Builder::default()
@@ -39,6 +39,8 @@ fn main() {
             cmd::save_config,
             cmd::close_splashscreen,
         ])
+        .on_menu_event(menu::menu_handler)
+        .menu(menu::init())
         .setup(setup::init)
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -1,7 +1,7 @@
 use log::{error, info};
 use rtools::conf::AppConf;
 /// tauri命令模块
-use tauri::{command, AppHandle, Manager};
+use tauri::{command, AppHandle, Manager, Config};
 
 /// close_splashscreen | 关闭 splashscreen
 #[command]
@@ -38,4 +38,10 @@ pub fn return_config() -> Result<serde_json::Value, &'static str> {
         }
     };
     Ok(config)
+}
+
+pub fn get_tauri_conf() -> Option<Config> {
+    let config_file = include_str!("../../tauri.conf.json");
+    let config = serde_json::from_str(config_file).expect("failed to parse tauri.conf.json");
+    Some(config)
 }
