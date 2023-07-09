@@ -3,9 +3,9 @@
 import { invoke } from '@tauri-apps/api/tauri'
 import { listen } from '@tauri-apps/api/event'
 // vue
-import { ref, onMounted, inject, watch, Ref } from 'vue'
+import { ref, onMounted, inject, onUpdated } from 'vue'
 // element-plus
-import { ElNotification, ElMessage } from 'element-plus'
+import { ElNotification } from 'element-plus'
 
 const randnum_title = ref()
 const randlist = ref()
@@ -14,10 +14,9 @@ const randlist = ref()
 const max = ref()
 const times = ref(1)
 
-// Taggle 切换器
+// state 状态
 const getbutton = ref(false) // 抽取按钮状态
 const resetbutton = ref(false) // 重置按钮状态
-const setting_box = ref(false) // 设置抽屉
 let animation_lock: boolean = false //动画锁定
 
 const Taggles = ref({
@@ -30,7 +29,6 @@ const Taggles = ref({
 let motioninterv: any
 
 const { config, write_conf } = inject<any>('app_config')
-
 
 // 抽取按钮
 async function getnum() {
@@ -122,80 +120,61 @@ async function randnum_title_listen() {
     })
 }
 
-// init 初始化
-onMounted(() => {
-    // 读取全局配置
+function read_config() {
     Taggles.value.csv_animation = config.value.csv_animation
     Taggles.value.csv_list = config.value.csv_list
     Taggles.value.csv_animation_speed = config.value.csv_animation_speed
+}
+
+// init 初始化
+onMounted(() => {
+    // 读取全局配置
+    read_config()
     // 重置
     reset()
     // 监听器
     list_listen()
     randnum_title_listen()
-    // 侦听器
-    watch(Taggles.value, async () => {
-        let data = JSON.parse(JSON.stringify(Taggles.value))
-        await write_conf(data, 'main').then(
-            ElMessage({
-                message: '设置已保存',
-                type: 'success',
-                grouping: true
-            })
-        )
-    })
+})
+onUpdated(() => {
+    read_config()
 })
 </script>
 
 <template>
-    <el-container>
-        <el-main>
-            <el-row justify="center">
-                <el-col>
-                    <p id="t-out">{{ randnum_title }}</p>
-                </el-col>
-                <el-col>
-                    <Transition>
-                        <p v-if="Taggles.csv_list" id="l-out">{{ randlist }}</p>
-                    </Transition>
-                </el-col>
-            </el-row>
-        </el-main>
-        <el-footer>
-            <el-row justify="center">
-                <el-col>
-                    <el-text>抽取次数</el-text>
-                </el-col>
-                <el-col :span="12">
-                    <el-slider v-model="times" show-input :min="1" :max="max" />
-                </el-col>
-            </el-row>
-            <el-row justify="center">
-                <el-button size="large" @click="getnum()" :disabled="getbutton">抽取</el-button>
-                <el-button size="large" @click="reset()" :disabled="resetbutton">重置</el-button>
-            </el-row>
-            <el-row justify="center">
-                <ElDrawer v-model="setting_box" :with-header="false" :size="'45%'">
-                    <el-row justify="center">
-                        <el-col>
-                            <el-switch v-model="Taggles.csv_list" active-text="打开列表显示" inactive-text="关闭列表显示"></el-switch>
-                        </el-col>
-                        <el-col>
-                            <el-switch v-model="Taggles.csv_animation" active-text="打开动画" inactive-text="关闭动画"></el-switch>
-                        </el-col>
-                        <el-col :span="12">
-                            <ElText>动画间隔 (单位:ms)</ElText><el-slider v-model="Taggles.csv_animation_speed" show-input
-                                :min="40" :max="100" />
-                        </el-col>
-                    </el-row>
-                </ElDrawer>
-                <ElButton @click="setting_box = true">其他设置</ElButton>
-            </el-row>
-        </el-footer>
-    </el-container>
+    <div class="main">
+        <el-row justify="center">
+            <el-col>
+                <p id="t-out">{{ randnum_title }}</p>
+            </el-col>
+            <el-col>
+                <Transition>
+                    <p v-if="Taggles.csv_list" id="l-out">{{ randlist }}</p>
+                </Transition>
+            </el-col>
+        </el-row>
+        <el-row justify="center">
+            <el-col>
+                <el-text>抽取次数</el-text>
+            </el-col>
+            <el-col :span="12">
+                <el-slider v-model="times" show-input :min="1" :max="max" />
+            </el-col>
+        </el-row>
+        <el-row justify="center">
+            <el-button size="large" @click="getnum()" :disabled="getbutton">抽取</el-button>
+            <el-button size="large" @click="reset()" :disabled="resetbutton">重置</el-button>
+        </el-row>
+    </div>
 </template>
 
 <style scoped>
+.main {
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+}
+
 #t-out {
     font-size: calc(10vmin);
 }
