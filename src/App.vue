@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import RandView from './views/RandView.vue';
+import RandView from './views/RandomView.vue';
 </script>
 
 <template>
