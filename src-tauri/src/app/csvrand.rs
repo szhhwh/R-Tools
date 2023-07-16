@@ -1,4 +1,4 @@
-use log::{debug, error, info};
+use log::{debug, error};
 use rand::prelude::*;
 use rtools::{conf::AppConf, exists};
 use std::collections::HashMap;
@@ -110,7 +110,7 @@ pub fn generate_randnum(times: u32, app_handle: tauri::AppHandle) -> Result<(), 
             }
         },
     );
-    info!("当前抽取结果: {result}");
+    debug!("Current Result: {result}");
     let _ = app_handle.emit_all("listoutput", &result); // 返回下方小字结果
     Ok(())
 }

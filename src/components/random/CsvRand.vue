@@ -5,7 +5,7 @@ import { listen } from '@tauri-apps/api/event'
 // vue
 import { ref, onMounted, inject, onUpdated } from 'vue'
 // element-plus
-import { ElNotification } from 'element-plus'
+import { ElMessage, ElNotification } from 'element-plus'
 import { clipboard } from '@tauri-apps/api';
 
 const randnum_title = ref()
@@ -93,6 +93,10 @@ async function reset() {
             randnum_title.value = "Rand"
             randlist.value = "Hello Rand"
             getbutton.value = false
+            ElMessage({
+                message: '已重置',
+                type: 'success'
+            })
         }
     ).catch(
         (err) => {
@@ -125,6 +129,16 @@ function read_config() {
     Taggles.value.csv_animation = config.value.csv_animation
     Taggles.value.csv_list = config.value.csv_list
     Taggles.value.csv_animation_speed = config.value.csv_animation_speed
+}
+
+function copyresult() {
+    clipboard.writeText(randlist.value).then(() => {
+        ElMessage({
+            message: '结果已复制',
+            type: 'info',
+            grouping: true
+        })
+    })
 }
 
 // init 初始化
@@ -163,9 +177,14 @@ onUpdated(() => {
             </el-col>
         </el-row>
         <el-row justify="center">
-            <el-button size="large" @click="getnum()" :disabled="getbutton">抽取</el-button>
-            <el-button size="large" @click="reset()" :disabled="resetbutton">重置</el-button>
-            <ElButton size="large" @click="() => { clipboard.writeText(randlist) }">复制结果</ElButton>
+            <el-button size="large" @click="getnum" :disabled="getbutton">抽取</el-button>
+            <el-popconfirm confirm-button-text="是" cancel-button-text="否" title="是否重置"
+                @confirm="reset">
+                <template #reference>
+                    <el-button size="large">重置</el-button>
+                </template>
+            </el-popconfirm>
+            <ElButton size="large" @click="copyresult">复制结果</ElButton>
         </el-row>
     </div>
 </template>
