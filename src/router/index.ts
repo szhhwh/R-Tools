@@ -6,17 +6,37 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      redirect: '/random/csv'
+      name: 'home',
+      component: HomeView
     },
     {
-      path: '/random/csv',
-      name: 'csvRand',
-      component: () => import('../components/random/CsvRand.vue') //延迟加载
+      path: '/calculators',
+      name: 'calculators',
+      component: () => import('../views/CalculatorView.vue'),
+      children: [
+        {
+          path: '/calculators/timeLapsephoto',
+          name: 'timeLapsephoto',
+          component: () => import('../components/calculators/TimeLapsephoto.vue')
+        },
+      ]
     },
     {
-      path: '/random/csv/setting',
-      name: 'csvRand_setting',
-      component: () => import('../components/random/CsvRandSetting.vue')
+      path: '/random',
+      name: 'random',
+      component: () => import('../views/RandomView.vue'),
+      children: [
+        {
+          path: '/random/csvrand',
+          name: 'csvrand',
+          component: () => import('../components/random/CsvRand.vue')
+        },
+        {
+          path: '/random/csvrand/setting',
+          name: 'csvRand_setting',
+          component: () => import('../components/random/CsvRandSetting.vue')
+        }
+      ]
     }
   ]
 })

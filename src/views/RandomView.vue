@@ -2,9 +2,8 @@
 import { Fold } from "@element-plus/icons";
 import { Expand } from "@element-plus/icons";
 import { ref } from "vue"
-import { RouterView } from 'vue-router'
 
-const activeIndex = ref('/random/csv')
+const activeIndex = ref('/random/csvrand')
 const iscollapse = ref<boolean>(false)
 </script>
 
@@ -13,13 +12,13 @@ const iscollapse = ref<boolean>(false)
     <div class="aside">
       <!-- 导航菜单 -->
       <ElButton :icon="iscollapse ? Expand : Fold" @click="iscollapse = !iscollapse"></ElButton>
-      <el-menu :default-active=activeIndex class="el-menu-demo" mode="vertical" :collapse="iscollapse" :router="true">
-        <el-menu-item index="/random/csv">
+      <el-menu :default-active=activeIndex mode="vertical" :collapse="iscollapse" :router="true">
+        <el-menu-item index="/random/csvrand">
           <ElIcon>
             <House></House>
           </ElIcon><span>CSV 随机</span>
         </el-menu-item>
-        <el-menu-item index="/random/csv/setting">
+        <el-menu-item index="/random/csvrand/setting">
           <el-icon>
             <Setting />
           </el-icon>

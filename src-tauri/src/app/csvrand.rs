@@ -123,7 +123,7 @@ pub fn reset() {
     for _i in 0..lenth {
         record.swap_remove(0);
     }
-    debug!("重置CSVRand")
+    debug!("reset CSVRand")
 }
 
 #[command]

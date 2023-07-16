@@ -6,6 +6,7 @@ import { listen } from '@tauri-apps/api/event'
 import { ref, onMounted, inject, onUpdated } from 'vue'
 // element-plus
 import { ElNotification } from 'element-plus'
+import { clipboard } from '@tauri-apps/api';
 
 const randnum_title = ref()
 const randlist = ref()
@@ -164,6 +165,7 @@ onUpdated(() => {
         <el-row justify="center">
             <el-button size="large" @click="getnum()" :disabled="getbutton">抽取</el-button>
             <el-button size="large" @click="reset()" :disabled="resetbutton">重置</el-button>
+            <ElButton size="large" @click="() => { clipboard.writeText(randlist) }">复制结果</ElButton>
         </el-row>
     </div>
 </template>

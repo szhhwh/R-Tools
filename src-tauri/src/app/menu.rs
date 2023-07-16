@@ -5,10 +5,10 @@ use super::{cmd::get_tauri_conf, windows};
 
 pub fn init() -> Menu {
     // 设置菜单
-    let preferences_menu = Submenu::new(
-        "设置",
-        Menu::new().add_item(CustomMenuItem::new("setting", "首选项")),
-    );
+    // let preferences_menu = Submenu::new(
+    //     "设置",
+    //     Menu::new().add_item(CustomMenuItem::new("setting", "首选项")),
+    // );
 
     // 帮助菜单
     let help = Submenu::new(
@@ -16,7 +16,7 @@ pub fn init() -> Menu {
         Menu::new().add_item(CustomMenuItem::new("about", "关于")),
     );
 
-    Menu::new().add_submenu(preferences_menu).add_submenu(help)
+    Menu::new().add_submenu(help)
 }
 
 /// 菜单栏切换Handle
