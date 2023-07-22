@@ -5,10 +5,10 @@ import { useRouter } from 'vue-router';
 let cards = [
     {
         index: 1,
-        name: 'CsvRand',
+        name: 'Calarand',
         label: 'CR',
-        descript: '随机输出CSV文件中的内容',
-        path: '/random/csvrand'
+        descript: '随机输出excel文件中的内容',
+        path: '/random/calarand'
     },
     {
         index: 2,

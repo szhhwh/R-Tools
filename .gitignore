@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# Cache
+.yarn
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -28,4 +31,6 @@ dist-ssr
 
 # Other
 *.ini
-*.csv
+*.xlsx
+*.xls
+*.xlsm

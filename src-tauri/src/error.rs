@@ -1,15 +1,18 @@
+use calamine::XlsxError;
 use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum AppError {
     #[error("{0}")]
     Err(String),
-    #[error("CsvIOError:")]
-    CsvIO(#[from] csv::Error),
     #[error("stdIOError:")]
     IO(#[from] std::io::Error),
-    #[error("json")]
+    #[error("JsonError")]
     JsonIO(#[from] serde_json::error::Error),
+    #[error("CalaMineIOError: ")]
+    CalaIO(#[from] calamine::Error),
+    #[error("XlsxError: ")]
+    XlsxError(#[from] XlsxError),
     #[error("Unkown")]
     Unkown(#[from] anyhow::Error)
 }

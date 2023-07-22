@@ -1,29 +1,28 @@
+use crate::app::readers::calareader;
 use log::{debug, error};
 use rand::prelude::*;
 use rtools::{conf::AppConf, exists};
 use std::collections::HashMap;
-use std::process;
 use std::sync::Mutex;
-use tauri::{Manager, command};
-use crate::app::readers::csvreader;
+use tauri::{command, Manager};
 
 // 初始化全局变量
 lazy_static! {
     // define global list object
-    static ref LIST: Mutex<HashMap<u32, String>> = Mutex::new({
+    static ref LIST: Mutex<HashMap<usize, String>> = Mutex::new({
         debug!("初始化全局list变量");
         let config = AppConf::read();
-        let csv = csvreader::CSV::new().read(config.csv_path).unwrap();
-        csv.content
+        let xlsx = calareader::CALA::new().read(config.cala_path).unwrap();
+        xlsx.content
     });
     // define global record object
-    static ref RECORD: Mutex<Vec<u32>> = Mutex::new(vec![]);
+    static ref RECORD: Mutex<Vec<usize>> = Mutex::new(vec![]);
 }
 
 #[command]
 pub fn init_list() -> Result<(), &'static str> {
-    if let false = exists(AppConf::read().csv_path) {
-        return Err("CSV 路径无效");
+    if let false = exists(AppConf::read().cala_path) {
+        return Err("excel 文件路径无效");
     }
     Ok(())
 }
@@ -38,7 +37,7 @@ pub fn generate_randnum(times: u32, app_handle: tauri::AppHandle) -> Result<(), 
     let mut count: u32 = 0;
     // 判断record是否为空，空数组则添加一个随机数
     if record.is_empty() {
-        let num = rand::thread_rng().gen_range(1..=list.len()) as u32;
+        let num = rand::thread_rng().gen_range(0..list.len());
         record.push(num);
         count += 1;
     }
@@ -51,7 +50,7 @@ pub fn generate_randnum(times: u32, app_handle: tauri::AppHandle) -> Result<(), 
                 if (times <= count) | (list.len() <= record.len()) {
                     break;
                 }
-                num = rand::thread_rng().gen_range(1..=list.len()) as u32; // 获取随机数
+                num = rand::thread_rng().gen_range(0..list.len()); // 获取随机数
 
                 // 判断num是否在record中，以及record的长度是否超出list的长度
                 if (list.len() > record.len()) & record.contains(&num) {
@@ -78,13 +77,13 @@ pub fn generate_randnum(times: u32, app_handle: tauri::AppHandle) -> Result<(), 
             Some(e) => e,
             None => {
                 error!("无法获取抽取记录vec");
-                return Err("无法获取抽取记录vec")
+                return Err("无法获取抽取记录vec");
             }
         }) {
             Some(s) => s,
             None => {
-                error!("element con't find in list");
-                return Err("element con't find in list")
+                error!("element({}) con't find in list", i);
+                return Err("element con't find in list");
             }
         };
         if i >= 1 {
@@ -100,13 +99,13 @@ pub fn generate_randnum(times: u32, app_handle: tauri::AppHandle) -> Result<(), 
             Some(e) => e,
             None => {
                 error!("无法获取抽取记录vec");
-                process::exit(1);
+                return Err("element con't find in list");
             }
         }) {
             Some(s) => String::from(s),
             None => {
                 error!("element con't find in list");
-                process::exit(1)
+                return Err("element con't find in list");
             }
         },
     );
@@ -123,7 +122,7 @@ pub fn reset() {
     for _i in 0..lenth {
         record.swap_remove(0);
     }
-    debug!("reset CSVRand")
+    debug!("reset calarand")
 }
 
 #[command]
@@ -133,9 +132,9 @@ pub fn return_list_number() -> u32 {
 }
 
 #[command]
-pub fn return_randresult(app_handle: tauri::AppHandle) {
+pub fn return_randresult(app_handle: tauri::AppHandle) -> Result<(), &'static str> {
     let list = LIST.lock().unwrap();
-    let num = rand::thread_rng().gen_range(1..=list.len()) as u32;
+    let num = rand::thread_rng().gen_range(0..list.len());
 
     let _ = app_handle.emit_all(
         // 返回大标题结果
@@ -144,8 +143,9 @@ pub fn return_randresult(app_handle: tauri::AppHandle) {
             Some(s) => String::from(s),
             None => {
                 error!("element con't find in list");
-                process::exit(1)
+                return Err("element con't find in list");
             }
         },
     );
+    Ok(())
 }

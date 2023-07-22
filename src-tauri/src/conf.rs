@@ -1,7 +1,6 @@
 use log::{debug, error, info, warn};
 use serde_json::Value;
 use std::{collections::BTreeMap, path::PathBuf};
-// use tauri::{Manager, Theme};
 
 use crate::{app_root, create_file, error::AppError, exists};
 
@@ -16,22 +15,22 @@ const CONF_NAME: &str = "conf.json";
 /// ```
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct AppConf {
-    /// CSV文件路径
-    pub csv_path: PathBuf,
+    /// excel文件路径
+    pub cala_path: PathBuf,
 
-    // CSVRand界面参数
-    pub csv_animation: bool,
-    pub csv_animation_speed: i32,
-    pub csv_list: bool,
+    // CalaRand界面参数
+    pub cala_animation: bool,
+    pub cala_animation_speed: i32,
+    pub cala_list: bool,
 }
 
 impl Default for AppConf {
     fn default() -> Self {
         Self {
-            csv_path: "".into(),
-            csv_animation: false,
-            csv_animation_speed: 40,
-            csv_list: true,
+            cala_path: "".into(),
+            cala_animation: false,
+            cala_animation_speed: 40,
+            cala_list: true,
         }
     }
 }
@@ -60,11 +59,13 @@ impl AppConf {
                     conf
                 } else {
                     error!("conf_read_parse_error");
+                    warn!("conf reset to default");
                     Self::default()
                 }
             }
             Err(err) => {
                 error!("conf_read_error: {}", err);
+                warn!("conf reset to default");
                 Self::default()
             }
         }
@@ -114,7 +115,6 @@ impl AppConf {
         match serde_json::to_string_pretty(&config) {
             Ok(content) => match serde_json::from_str(&content) {
                 Ok(a) => {
-                    dbg!(&a);
                     a
                 }
                 Err(err) => {

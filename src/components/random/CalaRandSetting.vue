@@ -6,17 +6,17 @@ import { open } from '@tauri-apps/api/dialog';
 import { appConfigDir } from '@tauri-apps/api/path';
 // element-plus
 import { Check } from '@element-plus/icons-vue'
-import { ElMessage, ElNotification } from 'element-plus'
+import { ElMessage } from 'element-plus'
 
-// 重新加载CSV文件
-const reload_csv_path =
+// 重新加载cala文件
+const reload_cala_path =
     async () => {
         let selected = await open({
             directory: false,
             multiple: false,
             filters: [{
-                name: 'CSV File',
-                extensions: ['csv', 'CSV']
+                name: 'xlsx File',
+                extensions: ['xlsx', 'XLSX']
             }],
             defaultPath: await appConfigDir(),
         });
@@ -30,7 +30,7 @@ const reload_csv_path =
         } else {
             // user selected a single file
             console.log("Selected File path: ", selected)
-            form.value.csv_path = selected.toString()
+            form.value.cala_path = selected.toString()
             let data: JSON = JSON.parse(JSON.stringify(form.value))
             write_conf(data, 'main')
         }
@@ -38,10 +38,10 @@ const reload_csv_path =
 
 // 设置表单
 const form = ref({
-    csv_path: "",
-    csv_list: true,
-    csv_animation: false,
-    csv_animation_speed: 40
+    cala_path: "",
+    cala_list: true,
+    cala_animation: false,
+    cala_animation_speed: 40
 })
 
 const speedoption = [
@@ -63,10 +63,10 @@ const speedoption = [
 const { config, write_conf } = inject<any>('app_config')
 
 onMounted(() => {
-    form.value.csv_animation = config.value.csv_animation
-    form.value.csv_list = config.value.csv_list
-    form.value.csv_animation_speed = config.value.csv_animation_speed
-    form.value.csv_path = config.value.csv_path
+    form.value.cala_animation = config.value.cala_animation
+    form.value.cala_list = config.value.cala_list
+    form.value.cala_animation_speed = config.value.cala_animation_speed
+    form.value.cala_path = config.value.cala_path
     watch(form.value, async () => {
         let data = JSON.parse(JSON.stringify(form.value))
         await write_conf(data, 'main').then(
@@ -83,26 +83,26 @@ onMounted(() => {
 <template>
     <el-container class="container">
         <el-header>
-            <h1>CSV 随机设置</h1>
+            <h1>Cala 随机设置</h1>
         </el-header>
         <el-main>
             <el-form :model="form">
                 <el-form-item>
-                    <el-input placeholder="CSV file path" v-model="form.csv_path" disabled>
-                        <template #prepend>CSV 文件路径</template>
+                    <el-input placeholder="excel file path" v-model="form.cala_path" disabled>
+                        <template #prepend>excel 文件路径</template>
                     </el-input>
                 </el-form-item>
                 <ElFormItem>
-                    <el-button type="primary" :icon="Check" @click="reload_csv_path">选择CSV文件</el-button>
+                    <el-button type="primary" :icon="Check" @click="reload_cala_path">选择 excel 文件</el-button>
                 </ElFormItem>
                 <ElFormItem label="列表显示">
-                    <el-switch v-model="form.csv_list" active-text="打开" inactive-text="关闭"></el-switch>
+                    <el-switch v-model="form.cala_list" active-text="打开" inactive-text="关闭"></el-switch>
                 </ElFormItem>
                 <ElFormItem label="抽取动画">
-                    <el-switch v-model="form.csv_animation" active-text="打开" inactive-text="关闭"></el-switch>
+                    <el-switch v-model="form.cala_animation" active-text="打开" inactive-text="关闭"></el-switch>
                 </ElFormItem>
                 <ElFormItem label="动画速度">
-                    <ElSelect v-model="form.csv_animation_speed">
+                    <ElSelect v-model="form.cala_animation_speed">
                         <ElOption v-for="item in speedoption" :key="item.value" :label="item.label" :value="item.value">
                         </ElOption>
                     </ElSelect>

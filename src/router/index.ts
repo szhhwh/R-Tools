@@ -27,14 +27,14 @@ const router = createRouter({
       component: () => import('../views/RandomView.vue'),
       children: [
         {
-          path: '/random/csvrand',
-          name: 'csvrand',
-          component: () => import('../components/random/CsvRand.vue')
+          path: '/random/calarand',
+          name: 'calarand',
+          component: () => import('../components/random/CalaRand.vue')
         },
         {
-          path: '/random/csvrand/setting',
-          name: 'csvRand_setting',
-          component: () => import('../components/random/CsvRandSetting.vue')
+          path: '/random/calarand/setting',
+          name: 'calaRand_setting',
+          component: () => import('../components/random/CalaRandSetting.vue')
         }
       ]
     }

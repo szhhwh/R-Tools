@@ -10,7 +10,7 @@ use tauri_plugin_log::{
 };
 
 mod app;
-use app::{cmd, csvrand, setup, menu};
+use app::{cmd, calarand, setup, menu};
 
 fn main() {
     let mut log = tauri_plugin_log::Builder::default()
@@ -27,14 +27,17 @@ fn main() {
         });
     }
 
+    let config = rtools::conf::AppConf::read();
+    let _table = app::readers::calareader::CALA::new().read(config.cala_path);
+
     tauri::Builder::default()
         .plugin(log.build())
         .invoke_handler(tauri::generate_handler![
-            csvrand::generate_randnum,
-            csvrand::reset,
-            csvrand::return_list_number,
-            csvrand::init_list,
-            csvrand::return_randresult,
+            calarand::generate_randnum,
+            calarand::reset,
+            calarand::return_list_number,
+            calarand::init_list,
+            calarand::return_randresult,
             cmd::return_config,
             cmd::save_config,
             cmd::close_splashscreen,

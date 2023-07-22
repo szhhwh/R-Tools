@@ -21,9 +21,9 @@ const resetbutton = ref(false) // 重置按钮状态
 let animation_lock: boolean = false //动画锁定
 
 const Taggles = ref({
-    csv_list: true,
-    csv_animation: false,
-    csv_animation_speed: 40
+    cala_list: true,
+    cala_animation: false,
+    cala_animation_speed: 40
 })
 
 // 动画定时器
@@ -35,14 +35,14 @@ const { config, write_conf } = inject<any>('app_config')
 async function getnum() {
     await invoke('init_list').then(
         () => {
-            if (Taggles.value.csv_animation == true && animation_lock === false) {
+            if (Taggles.value.cala_animation == true && animation_lock === false) {
                 animation_lock = true
                 resetbutton.value = true
                 motioninterv = setInterval(() => {
                     invoke("return_randresult")
-                }, Taggles.value.csv_animation_speed)
+                }, Taggles.value.cala_animation_speed)
             }
-            else if (Taggles.value.csv_animation == true && animation_lock === true) {
+            else if (Taggles.value.cala_animation == true && animation_lock === true) {
                 animation_lock = false
                 clearInterval(motioninterv)
                 invoke("generate_randnum", { times: times.value })
@@ -57,7 +57,7 @@ async function getnum() {
                     })
                 resetbutton.value = false
             }
-            else if (Taggles.value.csv_animation == false && animation_lock === false) {
+            else if (Taggles.value.cala_animation == false && animation_lock === false) {
                 invoke("generate_randnum", { times: times.value })
                     .catch((err) => {
                         getbutton.value = true
@@ -126,9 +126,9 @@ async function randnum_title_listen() {
 }
 
 function read_config() {
-    Taggles.value.csv_animation = config.value.csv_animation
-    Taggles.value.csv_list = config.value.csv_list
-    Taggles.value.csv_animation_speed = config.value.csv_animation_speed
+    Taggles.value.cala_animation = config.value.cala_animation
+    Taggles.value.cala_list = config.value.cala_list
+    Taggles.value.cala_animation_speed = config.value.cala_animation_speed
 }
 
 function copyresult() {
@@ -164,7 +164,7 @@ onUpdated(() => {
             </el-col>
             <el-col>
                 <Transition>
-                    <p v-if="Taggles.csv_list" id="l-out">{{ randlist }}</p>
+                    <p v-if="Taggles.cala_list" id="l-out">{{ randlist }}</p>
                 </Transition>
             </el-col>
         </el-row>

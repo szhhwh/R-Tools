@@ -22,8 +22,8 @@ provide('activeIndex', { activeIndex, changeactive })
           </ElIcon>
           <span>主页</span>
         </el-menu-item>
-        <el-menu-item index="/random/csvrand">
-          <span>CSV 随机数</span>
+        <el-menu-item index="/random/calarand">
+          <span>Cala 随机数</span>
         </el-menu-item>
         <el-menu-item index="/calculators/timeLapsephoto">
           <span>延时摄影小工具</span>
