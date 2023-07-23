@@ -17,6 +17,9 @@ const reload_cala_path =
             filters: [{
                 name: 'Excel 工作簿',
                 extensions: ['xlsx']
+            },{
+                name: 'Excel 97-2003 工作簿',
+                extensions: ['xls']
             },
             {
                 name: 'Excel 启用宏的工作簿',
