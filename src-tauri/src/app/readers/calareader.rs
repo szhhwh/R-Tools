@@ -21,9 +21,6 @@ impl<P: AsRef<Path> + Default> CALA<P> {
         if let Some(Ok(range)) = workbook.worksheet_range("Sheet1") {
             let cell = range.cells();
             for i in cell {
-                println!("usize1: {}", i.0);
-                println!("usize2: {}", i.1);
-                println!("DataType: {}", i.2);
                 list.insert(i.0, i.2.to_string());
             }
         }

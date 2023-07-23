@@ -3,13 +3,31 @@
 import { invoke } from '@tauri-apps/api/tauri'
 import { listen } from '@tauri-apps/api/event'
 // vue
-import { ref, onMounted, inject, onUpdated } from 'vue'
+import { ref, onMounted, inject, onUpdated, computed } from 'vue'
 // element-plus
 import { ElMessage, ElNotification } from 'element-plus'
 import { clipboard } from '@tauri-apps/api';
 
 const randnum_title = ref()
 const randlist = ref()
+
+let title_display = computed(() => {
+    if (randnum_title.value == undefined) {
+        return "Rand"
+    }
+    else {
+        return randnum_title.value
+    }
+})
+
+let list_display = computed(() => {
+    if (randlist.value == undefined) {
+        return "Hello Rand"
+    }
+    else {
+        return randlist.value
+    }
+})
 
 // 抽取参数
 const max = ref()
@@ -90,8 +108,8 @@ async function reset() {
                 max.value = len
             })
             invoke("reset") // 调用rust重置函数
-            randnum_title.value = "Rand"
-            randlist.value = "Hello Rand"
+            randnum_title.value = undefined
+            randlist.value = undefined
             getbutton.value = false
             ElMessage({
                 message: '已重置',
@@ -145,8 +163,6 @@ function copyresult() {
 onMounted(() => {
     // 读取全局配置
     read_config()
-    // 重置
-    reset()
     // 监听器
     list_listen()
     randnum_title_listen()
@@ -160,11 +176,11 @@ onUpdated(() => {
     <div class="main">
         <el-row justify="center">
             <el-col>
-                <p id="t-out">{{ randnum_title }}</p>
+                <p id="t-out">{{ title_display }}</p>
             </el-col>
             <el-col>
                 <Transition>
-                    <p v-if="Taggles.cala_list" id="l-out">{{ randlist }}</p>
+                    <p v-if="Taggles.cala_list" id="l-out">{{ list_display }}</p>
                 </Transition>
             </el-col>
         </el-row>
@@ -178,8 +194,7 @@ onUpdated(() => {
         </el-row>
         <el-row justify="center">
             <el-button size="large" @click="getnum" :disabled="getbutton">抽取</el-button>
-            <el-popconfirm confirm-button-text="是" cancel-button-text="否" title="是否重置"
-                @confirm="reset">
+            <el-popconfirm confirm-button-text="是" cancel-button-text="否" title="是否重置" @confirm="reset">
                 <template #reference>
                     <el-button size="large">重置</el-button>
                 </template>

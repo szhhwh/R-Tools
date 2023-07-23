@@ -27,9 +27,6 @@ fn main() {
         });
     }
 
-    let config = rtools::conf::AppConf::read();
-    let _table = app::readers::calareader::CALA::new().read(config.cala_path);
-
     tauri::Builder::default()
         .plugin(log.build())
         .invoke_handler(tauri::generate_handler![
