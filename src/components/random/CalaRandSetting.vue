@@ -15,8 +15,19 @@ const reload_cala_path =
             directory: false,
             multiple: false,
             filters: [{
-                name: 'xlsx File',
-                extensions: ['xlsx', 'XLSX']
+                name: 'Excel 工作簿',
+                extensions: ['xlsx']
+            },{
+                name: 'Excel 97-2003 工作簿',
+                extensions: ['xls']
+            },
+            {
+                name: 'Excel 启用宏的工作簿',
+                extensions: ['xlsm']
+            },
+            {
+                name: 'Excel 加载宏',
+                extensions: ['xlam']
             }],
             defaultPath: await appConfigDir(),
         });
@@ -93,7 +104,7 @@ onMounted(() => {
                     </el-input>
                 </el-form-item>
                 <ElFormItem>
-                    <el-button type="primary" :icon="Check" @click="reload_cala_path">选择 excel 文件</el-button>
+                    <el-button type="primary" :icon="Check" @click="reload_cala_path">选择 Excel 工作簿</el-button>
                 </ElFormItem>
                 <ElFormItem label="列表显示">
                     <el-switch v-model="form.cala_list" active-text="打开" inactive-text="关闭"></el-switch>

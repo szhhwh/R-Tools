@@ -1,4 +1,4 @@
-use calamine::XlsxError;
+use calamine::{XlsxError, XlsError};
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -13,6 +13,8 @@ pub enum AppError {
     CalaIO(#[from] calamine::Error),
     #[error("XlsxError: ")]
     XlsxError(#[from] XlsxError),
+    #[error("XlsError: ")]
+    XlsError(#[from] XlsError),
     #[error("Unkown")]
     Unkown(#[from] anyhow::Error)
 }
