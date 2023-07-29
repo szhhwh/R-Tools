@@ -32,42 +32,49 @@ pub fn init_list() -> Result<(), &'static str> {
 }
 
 fn rand(times: u32) -> Result<(), AppError> {
+    let config = AppConf::read();
     let mut record = RECORD.lock().unwrap();
     let list = LIST.lock().unwrap();
 
-    // counter 计数器
-    let mut count: u32 = 0;
-    // 判断record是否为空，空数组则添加一个随机数
-    if record.is_empty() {
-        let num = rand::thread_rng().gen_range(0..list.len());
-        record.push(num);
-        count += 1;
-    }
-    // 进入生成循环
-    if (list.len() > record.len()) & (times > count) {
-        let mut num; // 定义临时数字
-        for _i in 1..=times {
-            // 循环times次
-            loop {
-                if (times <= count) | (list.len() <= record.len()) {
-                    break;
-                }
-                num = rand::thread_rng().gen_range(0..list.len()); // 获取随机数
+    if config.antiduble == true {
+        // counter 计数器
+        let mut count: u32 = 0;
+        // 判断record是否为空，空数组则添加一个随机数
+        if record.is_empty() {
+            let num = rand::thread_rng().gen_range(0..list.len());
+            record.push(num);
+            count += 1;
+        }
+        // 进入生成循环
+        if (list.len() > record.len()) & (times > count) {
+            let mut num; // 定义临时数字
+            for _i in 1..=times {
+                // 循环times次
+                loop {
+                    if (times <= count) | (list.len() <= record.len()) {
+                        break;
+                    }
+                    num = rand::thread_rng().gen_range(0..list.len()); // 获取随机数
 
-                // 判断num是否在record中，以及record的长度是否超出list的长度
-                if (list.len() > record.len()) & record.contains(&num) {
-                    continue;
-                } else {
-                    // push num into record
-                    record.push(num);
-                    // counter
-                    count += 1;
-                    break;
+                    // 判断num是否在record中，以及record的长度是否超出list的长度
+                    if (list.len() > record.len()) & record.contains(&num) {
+                        continue;
+                    } else {
+                        // push num into record
+                        record.push(num);
+                        // counter
+                        count += 1;
+                        break;
+                    }
                 }
             }
+        } else if list.len() == record.len() {
+            return Err(AppError::Err("列表抽取完毕".into()));
         }
-    } else if list.len() == record.len() {
-        return Err(AppError::Err("列表抽取完毕".into()));
+    } else if config.antiduble == false {
+        for _i in 1..=times {
+            record.push(rand::thread_rng().gen_range(0..list.len()));
+        }
     }
     Ok(())
 }
@@ -84,7 +91,7 @@ pub fn generate_randnum(times: u32, app_handle: tauri::AppHandle) -> Result<(), 
             }
         }
     }
-    match listoutput(&app_handle) {
+    match titleoutput(&app_handle) {
         Ok(_) => (),
         Err(e) => {
             error!("{e}");
@@ -93,7 +100,7 @@ pub fn generate_randnum(times: u32, app_handle: tauri::AppHandle) -> Result<(), 
             }
         }
     }
-    match titleoutput(&app_handle) {
+    match listoutput(&app_handle) {
         Ok(_) => (),
         Err(e) => {
             error!("{e}");
