@@ -5,9 +5,9 @@ use thiserror::Error;
 pub enum AppError {
     #[error("{0}")]
     Err(String),
-    #[error("stdIOError:")]
+    #[error("stdIOError: ")]
     IO(#[from] std::io::Error),
-    #[error("JsonError")]
+    #[error("JsonError: ")]
     JsonIO(#[from] serde_json::error::Error),
     #[error("CalaMineIOError: ")]
     CalaIO(#[from] calamine::Error),
@@ -15,8 +15,6 @@ pub enum AppError {
     XlsxError(#[from] XlsxError),
     #[error("XlsError: ")]
     XlsError(#[from] XlsError),
-    #[error("Unkown")]
-    Unkown(#[from] anyhow::Error)
 }
 
 impl From<String> for AppError {

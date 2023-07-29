@@ -52,7 +52,8 @@ const form = ref({
     cala_path: "",
     cala_list: true,
     cala_animation: false,
-    cala_animation_speed: 40
+    cala_animation_speed: 40,
+    antiduble: true
 })
 
 const speedoption = [
@@ -78,6 +79,7 @@ onMounted(() => {
     form.value.cala_list = config.value.cala_list
     form.value.cala_animation_speed = config.value.cala_animation_speed
     form.value.cala_path = config.value.cala_path
+    form.value.antiduble = config.value.antiduble
     watch(form.value, async () => {
         let data = JSON.parse(JSON.stringify(form.value))
         await write_conf(data, 'main').then(
@@ -108,6 +110,9 @@ onMounted(() => {
                 </ElFormItem>
                 <ElFormItem label="列表显示">
                     <el-switch v-model="form.cala_list" active-text="打开" inactive-text="关闭"></el-switch>
+                </ElFormItem>
+                <ElFormItem label="抽取结果唯一化">
+                    <el-switch v-model="form.antiduble" active-text="是" inactive-text="否"></el-switch>
                 </ElFormItem>
                 <ElFormItem label="抽取动画">
                     <el-switch v-model="form.cala_animation" active-text="打开" inactive-text="关闭"></el-switch>

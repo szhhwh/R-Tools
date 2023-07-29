@@ -22,22 +22,26 @@ pub struct AppConf {
     pub cala_animation: bool,
     pub cala_animation_speed: i32,
     pub cala_list: bool,
+
+    /// 是否开启反重复
+    pub antiduble: bool
 }
 
 impl Default for AppConf {
     fn default() -> Self {
         Self {
             cala_path: "".into(),
-            cala_animation: false,
+            cala_animation: true,
             cala_animation_speed: 40,
             cala_list: true,
+            antiduble: true
         }
     }
 }
 
 impl AppConf {
-    pub fn new() -> Self {
-        warn!("config_init");
+    fn _new() -> Self {
+        info!("config_init");
         Default::default()
     }
 
@@ -80,7 +84,7 @@ impl AppConf {
         if !exists(path) {
             match create_file(path) {
                 Ok(_) => (),
-                Err(e) => return Err(AppError::Unkown(e)),
+                Err(e) => return Err(e),
             }
             info!("conf_create");
         }
