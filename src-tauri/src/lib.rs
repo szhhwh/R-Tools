@@ -1,4 +1,4 @@
-use anyhow::Result;
+use error::AppError;
 use std::{
     fs,
     path::{Path, PathBuf}, ffi::OsStr,
@@ -25,7 +25,7 @@ where P: AsRef<Path> + AsRef<OsStr>
 }
 
 /// 创建文件
-pub fn create_file<P>(filename: P) -> Result<()>
+pub fn create_file<P>(filename: P) -> Result<(), AppError>
 where
     P: AsRef<Path>,
 {

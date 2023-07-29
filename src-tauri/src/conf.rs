@@ -80,7 +80,7 @@ impl AppConf {
         if !exists(path) {
             match create_file(path) {
                 Ok(_) => (),
-                Err(e) => return Err(AppError::Unkown(e)),
+                Err(e) => return Err(e),
             }
             info!("conf_create");
         }
