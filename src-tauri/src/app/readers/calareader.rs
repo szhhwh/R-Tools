@@ -20,7 +20,9 @@ impl<P: AsRef<Path> + Default> CALA<P> {
         let mut list: HashMap<usize, String> = HashMap::new();
         if (extension == "xlsx") | (extension == "xlsm") | (extension == "xlam") {
             let mut workbook: Xlsx<_> = open_workbook(&path)?;
-            if let Some(Ok(range)) = workbook.worksheet_range("Sheet1") {
+            let for_tablename: Xlsx<_> = open_workbook(&path)?;
+            let tablename = for_tablename.sheet_names();
+            if let Some(Ok(range)) = workbook.worksheet_range(tablename[0].as_str()) {
                 let cell = range.cells();
                 for i in cell {
                     list.insert(i.0, i.2.to_string());
@@ -28,7 +30,9 @@ impl<P: AsRef<Path> + Default> CALA<P> {
             }
         } else if extension == "xls" {
             let mut workbook: Xls<_> = open_workbook(&path)?;
-            if let Some(Ok(range)) = workbook.worksheet_range("Sheet1") {
+            let for_tablename: Xls<_> = open_workbook(&path)?;
+            let tablename = for_tablename.sheet_names();
+            if let Some(Ok(range)) = workbook.worksheet_range(tablename[0].as_str()) {
                 let cell = range.cells();
                 for i in cell {
                     list.insert(i.0, i.2.to_string());
