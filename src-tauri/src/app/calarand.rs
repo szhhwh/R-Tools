@@ -2,8 +2,8 @@ use crate::app::readers::calareader;
 use log::{debug, error};
 use rand::prelude::*;
 use rtools::{conf::AppConf, exists};
-use std::collections::HashMap;
 use std::sync::Mutex;
+use std::{collections::HashMap, path::PathBuf};
 use tauri::{command, Manager};
 
 // 初始化全局变量
@@ -12,7 +12,10 @@ lazy_static! {
     static ref LIST: Mutex<HashMap<usize, String>> = Mutex::new({
         debug!("初始化全局list变量");
         let config = AppConf::read();
-        let xlsx = calareader::CALA::new().read(config.cala_path).unwrap();
+        let xlsx = calareader::CALA::new().read(config.cala_path).unwrap_or_else(|err|{
+            println!("{err}");
+            calareader::CALA { file_path: PathBuf::new(), content: HashMap::new() }
+        });
         xlsx.content
     });
     // define global record object
