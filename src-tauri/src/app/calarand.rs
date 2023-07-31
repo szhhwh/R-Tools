@@ -1,5 +1,5 @@
 use crate::app::readers::calareader;
-use log::{debug, error, warn};
+use log::{debug, error, warn, info};
 use rand::prelude::*;
 use rtools::error::AppError;
 use rtools::{conf::AppConf, exists};
@@ -21,6 +21,18 @@ lazy_static! {
     });
     // define global record object
     static ref RECORD: Mutex<Vec<usize>> = Mutex::new(vec![]);
+}
+
+#[command]
+pub fn reloadlist() {
+    let mut list = LIST.lock().unwrap();
+    let config = AppConf::read();
+    let xlsx = calareader::CALA::new().read(config.cala_path).unwrap_or_else(|err|{
+        println!("{err}");
+        calareader::CALA { file_path: PathBuf::new(), content: HashMap::new() }
+    });
+    *list = xlsx.content;
+    info!("reload excel list")
 }
 
 #[command]

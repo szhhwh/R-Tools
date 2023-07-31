@@ -4,6 +4,7 @@ import { inject, onMounted, ref, watch } from 'vue';
 // tauri
 import { open } from '@tauri-apps/api/dialog';
 import { appConfigDir } from '@tauri-apps/api/path';
+import { invoke } from '@tauri-apps/api';
 // element-plus
 import { Check } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
@@ -17,7 +18,8 @@ const reload_cala_path =
             filters: [{
                 name: 'Excel 工作簿',
                 extensions: ['xlsx']
-            },{
+            },
+            {
                 name: 'Excel 97-2003 工作簿',
                 extensions: ['xls']
             },
@@ -45,17 +47,22 @@ const reload_cala_path =
             let data: JSON = JSON.parse(JSON.stringify(form.value))
             write_conf(data, 'main')
         }
+        get_sheet_names()
+        await invoke("reloadlist")
+        await invoke("reset")
     }
 
 // 设置表单
 const form = ref({
-    cala_path: "",
+    cala_path: '',
     cala_list: true,
     cala_animation: false,
     cala_animation_speed: 40,
-    antiduble: true
+    antiduble: true,
+    lastsheet: ''
 })
 
+// 动画速度设置选项
 const speedoption = [
     {
         value: 40,
@@ -71,6 +78,28 @@ const speedoption = [
     }
 ]
 
+let tablename = ref<Sheet[]>([])
+interface Sheet {
+    value: number,
+    label: string
+}
+async function get_sheet_names() {
+    await invoke("return_sheet_names").then(
+        (v) => {
+            let item = v as string[]
+            let newname: Sheet[] = []
+            for (let i in item) {
+                console.log(i)
+                newname.push({
+                    value: tablename.value.length + 1,
+                    label: item[i]
+                })
+                tablename.value = newname
+            }
+        }
+    )
+}
+
 // 注入全局配置
 const { config, write_conf } = inject<any>('app_config')
 
@@ -80,6 +109,8 @@ onMounted(() => {
     form.value.cala_animation_speed = config.value.cala_animation_speed
     form.value.cala_path = config.value.cala_path
     form.value.antiduble = config.value.antiduble
+    form.value.lastsheet = config.value.lastsheet
+    get_sheet_names()
     watch(form.value, async () => {
         let data = JSON.parse(JSON.stringify(form.value))
         await write_conf(data, 'main').then(
@@ -122,6 +153,15 @@ onMounted(() => {
                         <ElOption v-for="item in speedoption" :key="item.value" :label="item.label" :value="item.value">
                         </ElOption>
                     </ElSelect>
+                </ElFormItem>
+                <ElFormItem label="选择读取的表">
+                    <ElSelect v-model="form.lastsheet" :no-data-text="'无可用的表'" :placeholder="'表名称（默认使用第一个表）'">
+                        <ElOption v-for="item in tablename" :key="item.value" :label="item.label" :value="item.label">
+                        </ElOption>
+                    </ElSelect>
+                </ElFormItem>
+                <ElFormItem>
+                    <ElButton @click="get_sheet_names">重新加载表名称</ElButton>
                 </ElFormItem>
             </el-form>
         </el-main>

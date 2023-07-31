@@ -35,9 +35,11 @@ fn main() {
             calarand::return_list_number,
             calarand::init_list,
             calarand::return_randresult,
+            calarand::reloadlist,
             cmd::return_config,
             cmd::save_config,
             cmd::close_splashscreen,
+            cmd::return_sheet_names,
         ])
         .on_menu_event(menu::menu_handler)
         .menu(menu::init())

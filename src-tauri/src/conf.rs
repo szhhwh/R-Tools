@@ -17,14 +17,14 @@ const CONF_NAME: &str = "conf.json";
 pub struct AppConf {
     /// excel文件路径
     pub cala_path: PathBuf,
-
     // CalaRand界面参数
     pub cala_animation: bool,
     pub cala_animation_speed: i32,
     pub cala_list: bool,
-
     /// 是否开启反重复
-    pub antiduble: bool
+    pub antiduble: bool,
+    /// 上一次选择的sheet名
+    pub lastsheet: String
 }
 
 impl Default for AppConf {
@@ -34,19 +34,21 @@ impl Default for AppConf {
             cala_animation: true,
             cala_animation_speed: 40,
             cala_list: true,
-            antiduble: true
+            antiduble: true,
+            lastsheet: "".into()
         }
     }
 }
 
 impl AppConf {
+    /// 新建AppConf实例
     fn _new() -> Self {
         info!("config_init");
         Default::default()
     }
 
     /// 返回配置文件路径
-    pub fn file_path() -> PathBuf {
+    fn file_path() -> PathBuf {
         app_root().join(CONF_NAME)
     }
 
@@ -88,7 +90,7 @@ impl AppConf {
             }
             info!("conf_create");
         }
-        if let Ok(v) = serde_json::to_string_pretty(&self) {
+        if let Ok(v) = serde_json::to_string(&self) {
             debug!("Config context: {}", &v);
             std::fs::write(path, v).unwrap_or_else(|err| {
                 error!("conf_write: {}", err);
@@ -101,6 +103,7 @@ impl AppConf {
     }
 
     /// 传入新的json正文，并更新结构体中的配置数据
+    /// 返回Self
     pub fn modify(self, json: Value) -> Self {
         debug!("传入的json对象: {json}");
         // 将结构体转为json
