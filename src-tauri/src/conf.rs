@@ -42,7 +42,7 @@ impl Default for AppConf {
 
 impl AppConf {
     /// 新建AppConf实例
-    fn _new() -> Self {
+    fn new() -> Self {
         info!("config_init");
         Default::default()
     }
