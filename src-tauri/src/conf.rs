@@ -64,14 +64,15 @@ impl AppConf {
                 if let Ok(conf) = serde_json::from_str(&content) {
                     conf
                 } else {
-                    error!("conf_read_parse_error");
-                    warn!("conf reset to default");
-                    Self::default()
+                    error!("config_parse_error");
+                    warn!("config reset to default");
+                    let config = Self::new();
+                    Self::modify(config, serde_json::from_str(&content).unwrap())
                 }
             }
             Err(err) => {
-                error!("conf_read_error: {}", err);
-                warn!("conf reset to default");
+                error!("config_read_error: {}", err);
+                warn!("config reset to default");
                 Self::default()
             }
         }

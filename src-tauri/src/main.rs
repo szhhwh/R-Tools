@@ -4,18 +4,23 @@
 #[macro_use]
 extern crate lazy_static;
 
+use rtools::app_root;
 use tauri_plugin_log::{
     fern::colors::{Color, ColoredLevelConfig},
     LogTarget,
 };
 
 mod app;
-use app::{cmd, calarand, setup, menu};
+use app::{calarand, cmd, menu, setup};
 
 fn main() {
     let mut log = tauri_plugin_log::Builder::default()
-        .targets([LogTarget::Stdout, LogTarget::Webview])
-        .level(log::LevelFilter::Trace);
+        .targets([
+            LogTarget::Stdout,
+            LogTarget::Webview,
+            LogTarget::Folder(app_root()),
+        ])
+        .level(log::LevelFilter::Debug);
 
     if cfg!(debug_assertions) {
         log = log.with_colors(ColoredLevelConfig {
