@@ -1,9 +1,10 @@
+use crate::app::readers::calareader;
 use log::{error, info};
 use rtools::conf::AppConf;
 /// tauri命令模块
-use tauri::{command, AppHandle, Manager, Config};
+use tauri::{command, AppHandle, Config, Manager};
 
-/// close_splashscreen | 关闭 splashscreen
+/// 关闭 splashscreen
 #[command]
 pub fn close_splashscreen(window: tauri::Window) {
     // Close splashscreen
@@ -40,8 +41,24 @@ pub fn return_config() -> Result<serde_json::Value, &'static str> {
     Ok(config)
 }
 
+/// 读取tauri.conf.json
 pub fn get_tauri_conf() -> Option<Config> {
     let config_file = include_str!("../../tauri.conf.json");
     let config = serde_json::from_str(config_file).expect("failed to parse tauri.conf.json");
     Some(config)
+}
+
+/// 向前端返回工作簿中包含的表名称
+/// 
+/// 前端以**数组**的方式收到包含的值
+#[command]
+pub fn return_sheet_names() -> serde_json::Value {
+    let config = AppConf::read();
+    match calareader::CALA::sheet_names(config.cala_path) {
+        Ok(v) => v,
+        Err(_) => {
+            error!("excel file path unavaliable");
+            serde_json::Value::Null
+        }
+    }
 }

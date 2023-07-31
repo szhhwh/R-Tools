@@ -46,7 +46,6 @@ const Taggles = ref({
 
 // 动画定时器
 let motioninterv: any
-
 const { config, write_conf } = inject<any>('app_config')
 
 // 抽取按钮
@@ -126,7 +125,6 @@ async function reset() {
             })
         }
     )
-
 }
 
 // 下方抽取列表监听器
