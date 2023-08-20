@@ -30,11 +30,6 @@ const router = createRouter({
           path: '/random/calarand',
           name: 'calarand',
           component: () => import('../components/random/CalaRand.vue')
-        },
-        {
-          path: '/random/calarand/setting',
-          name: 'calaRand_setting',
-          component: () => import('../components/random/CalaRandSetting.vue')
         }
       ]
     }
