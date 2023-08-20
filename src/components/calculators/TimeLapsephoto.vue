@@ -14,6 +14,11 @@ let fps = ref(25) // 帧率
 let videotime = ref() // 视频时间
 let interval = ref() // 时间间隔
 let realtime = ref() // 拍摄时长
+let photosize = ref(20) // 单张图片大小
+
+let totalsize = computed(() => {
+    return (photosize.value * number.value)
+})
 
 let speed = computed(() => {
     return (realtime.value / videotime.value).toFixed(2)
@@ -64,6 +69,7 @@ let realtime_cp = computed({
     }
 })
 
+// FPS 选项卡
 const fpsoption = [
     {
         value: 10,
@@ -165,8 +171,9 @@ const fpsoption = [
     <ElInputNumber v-model="videotime_cp"></ElInputNumber>
     <p>拍摄时长（分）：</p>
     <ElInputNumber v-model="realtime_cp"></ElInputNumber>
-    <!-- <p>拍摄间隔（秒）：</p>
-    <ElInputNumber v-model="interval_cp"></ElInputNumber> -->
+    <p>单张图片大小（兆）：</p>
+    <ElInputNumber v-model="photosize"></ElInputNumber>
+    <p>大约占用的空间（兆）：{{ totalsize }}</p>
     <p>拍摄间隔（秒）：{{ interval_cp }}</p>
     <p>照片数量：{{ number }} 张</p>
     <p>倍率：{{ speed }} 倍</p>
