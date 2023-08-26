@@ -2,11 +2,15 @@
 // tauri
 import { invoke } from '@tauri-apps/api/tauri'
 import { listen } from '@tauri-apps/api/event'
+import { appConfigDir } from '@tauri-apps/api/path';
+import { open } from '@tauri-apps/api/dialog';
 // vue
-import { ref, onMounted, inject, onUpdated, computed } from 'vue'
+import { ref, onMounted, inject, onUpdated, computed, watch } from 'vue'
 // element-plus
 import { ElMessage, ElNotification } from 'element-plus'
 import { clipboard } from '@tauri-apps/api';
+import { Setting } from '@element-plus/icons';
+import { Check } from '@element-plus/icons-vue'
 
 const randnum_title = ref()
 const randlist = ref()
@@ -157,8 +161,116 @@ function copyresult() {
     })
 }
 
+// 重新加载cala文件
+const reload_cala_path =
+    async () => {
+        let selected = await open({
+            directory: false,
+            multiple: false,
+            filters: [{
+                name: 'Excel 工作簿',
+                extensions: ['xlsx']
+            },
+            {
+                name: 'Excel 97-2003 工作簿',
+                extensions: ['xls']
+            },
+            {
+                name: 'Excel 启用宏的工作簿',
+                extensions: ['xlsm']
+            },
+            {
+                name: 'Excel 加载宏',
+                extensions: ['xlam']
+            }],
+            defaultPath: await appConfigDir(),
+        });
+
+        if (selected === null) {
+            // user cancelled the selection
+            ElMessage({
+                message: "未选择文件",
+                type: 'warning'
+            })
+        } else {
+            // user selected a single file
+            console.log("Selected File path: ", selected)
+            form.value.cala_path = selected.toString()
+            let data: JSON = JSON.parse(JSON.stringify(form.value))
+            write_conf(data, 'main')
+        }
+        get_sheet_names()
+        await invoke("reloadlist")
+        reset()
+    }
+
+// 设置表单
+const form = ref({
+    cala_path: '',
+    cala_list: true,
+    cala_animation: false,
+    cala_animation_speed: 40,
+    antiduble: true,
+    lastsheet: ''
+})
+
+// 动画速度设置选项
+const speedoption = [
+    {
+        value: 40,
+        label: "快 Fast 40ms"
+    },
+    {
+        value: 60,
+        label: "适中 Midium 60ms"
+    },
+    {
+        value: 80,
+        label: "慢 Slow 80ms"
+    }
+]
+
+let tablename = ref<Sheet[]>([])
+interface Sheet {
+    value: number,
+    label: string
+}
+async function get_sheet_names() {
+    await invoke("return_sheet_names").then(
+        (v) => {
+            let item = v as string[]
+            let newname: Sheet[] = []
+            for (let i in item) {
+                console.log(i)
+                newname.push({
+                    value: tablename.value.length + 1,
+                    label: item[i]
+                })
+                tablename.value = newname
+            }
+        }
+    )
+}
+
 // init 初始化
 onMounted(() => {
+    form.value.cala_animation = config.value.cala_animation
+    form.value.cala_list = config.value.cala_list
+    form.value.cala_animation_speed = config.value.cala_animation_speed
+    form.value.cala_path = config.value.cala_path
+    form.value.antiduble = config.value.antiduble
+    form.value.lastsheet = config.value.lastsheet
+    get_sheet_names()
+    watch(form.value, async () => {
+        let data = JSON.parse(JSON.stringify(form.value))
+        await write_conf(data, 'main').then(
+            ElMessage({
+                message: '设置已更新',
+                type: 'success',
+                grouping: true
+            })
+        )
+    })
     // 读取全局配置
     read_config()
     // 监听器
@@ -168,6 +280,8 @@ onMounted(() => {
 onUpdated(() => {
     read_config()
 })
+
+const settingbox = ref(false)
 </script>
 
 <template>
@@ -198,8 +312,46 @@ onUpdated(() => {
                 </template>
             </el-popconfirm>
             <ElButton size="large" @click="copyresult">复制结果</ElButton>
+            <ElButton :icon="Setting" size="large" @click="settingbox = true">设置</ElButton>
         </el-row>
     </div>
+
+    <ElDrawer v-model="settingbox" title="Cala 随机设置" size="80%">
+        <el-form :model="form">
+            <el-form-item>
+                <el-input placeholder="excel file path" v-model="form.cala_path" disabled>
+                    <template #prepend>excel 文件路径</template>
+                </el-input>
+            </el-form-item>
+            <ElFormItem>
+                <el-button type="primary" :icon="Check" @click="reload_cala_path">选择 Excel 工作簿</el-button>
+            </ElFormItem>
+            <ElFormItem label="列表显示">
+                <el-switch v-model="form.cala_list" active-text="打开" inactive-text="关闭"></el-switch>
+            </ElFormItem>
+            <ElFormItem label="抽取结果唯一化">
+                <el-switch v-model="form.antiduble" active-text="是" inactive-text="否"></el-switch>
+            </ElFormItem>
+            <ElFormItem label="抽取动画">
+                <el-switch v-model="form.cala_animation" active-text="打开" inactive-text="关闭"></el-switch>
+            </ElFormItem>
+            <ElFormItem label="动画速度">
+                <ElSelect v-model="form.cala_animation_speed">
+                    <ElOption v-for="item in speedoption" :key="item.value" :label="item.label" :value="item.value">
+                    </ElOption>
+                </ElSelect>
+            </ElFormItem>
+            <ElFormItem label="选择读取的表">
+                <ElSelect v-model="form.lastsheet" :no-data-text="'无可用的表'" :placeholder="'表名称（默认使用第一个表）'">
+                    <ElOption v-for="item in tablename" :key="item.value" :label="item.label" :value="item.label">
+                    </ElOption>
+                </ElSelect>
+            </ElFormItem>
+            <ElFormItem>
+                <ElButton @click="get_sheet_names">重新加载表名称</ElButton>
+            </ElFormItem>
+        </el-form>
+    </ElDrawer>
 </template>
 
 <style scoped>
