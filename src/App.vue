@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { House } from '@element-plus/icons'
-import { provide, ref } from 'vue';
+import { provide, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
 
 let activeIndex = ref('/')
 function changeactive(newindex: string) {
@@ -9,27 +10,23 @@ function changeactive(newindex: string) {
 }
 
 provide('activeIndex', { activeIndex, changeactive })
+const router = useRouter()
+
+watch(router.currentRoute, () => {
+  if (router.currentRoute.value.path !== '/') {
+    backhome.value = true
+  }
+  else {
+    backhome.value = false
+  }
+})
+
+let backhome = ref<boolean>(false)
 </script>
 
 <template>
   <el-container>
-    <el-header>
-      <el-menu :default-active=activeIndex :router="true" mode="horizontal">
-        <div class="flex"></div>
-        <el-menu-item index="/">
-          <ElIcon>
-            <House></House>
-          </ElIcon>
-          <span>主页</span>
-        </el-menu-item>
-        <el-menu-item index="/random/calarand">
-          <span>Cala 随机数</span>
-        </el-menu-item>
-        <el-menu-item index="/calculators/timeLapsephoto">
-          <span>延时摄影小工具</span>
-        </el-menu-item>
-      </el-menu>
-    </el-header>
+    <el-button v-show="backhome" @click="() => router.push('/')" :icon="House" id="backhome">返回首页</el-button>
     <el-main class="main">
       <router-view v-slot="{ Component }">
         <keep-alive>
@@ -43,6 +40,13 @@ provide('activeIndex', { activeIndex, changeactive })
 <style scoped>
 .main {
   height: 100%;
+}
+
+#backhome {
+  position: fixed;
+  right: 2%;
+  top: 2%;
+  z-index: 1;
 }
 </style>
 
