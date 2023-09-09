@@ -36,9 +36,9 @@ fn main() {
         .plugin(log.build())
         .invoke_handler(tauri::generate_handler![
             calarand::generate_randnum,
-            calarand::reset,
+            calarand::reset_counter,
             calarand::return_list_number,
-            calarand::init_list,
+            calarand::cala_is_exist,
             calarand::return_randresult,
             calarand::reloadlist,
             cmd::return_config,
