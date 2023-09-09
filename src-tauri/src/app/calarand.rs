@@ -36,9 +36,9 @@ pub fn reloadlist() {
 }
 
 #[command]
-pub fn init_list() -> Result<(), &'static str> {
+pub fn cala_is_exist() -> Result<(), &'static str> {
     if let false = exists(AppConf::read().cala_path) {
-        return Err("excel 文件路径无效");
+        return Err("Excel 文件路径无效");
     }
     Ok(())
 }
@@ -177,9 +177,9 @@ fn titleoutput(app_handle: &tauri::AppHandle) -> Result<(), AppError> {
     Ok(())
 }
 
-/// 重置计数器
+/// 计数器重置
 #[command]
-pub fn reset() {
+pub fn reset_counter() {
     let mut record = RECORD.lock().unwrap();
     let lenth = record.len();
     for _i in 0..lenth {
