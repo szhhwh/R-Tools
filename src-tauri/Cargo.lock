@@ -2243,13 +2243,14 @@ dependencies = [
 
 [[package]]
 name = "rtools"
-version = "0.4.6"
+version = "0.5.0"
 dependencies = [
  "anyhow",
  "calamine",
  "lazy_static",
  "log",
  "rand 0.8.5",
+ "semver",
  "serde",
  "serde_json",
  "tauri",

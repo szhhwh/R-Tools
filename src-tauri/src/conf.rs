@@ -2,7 +2,7 @@ use log::{debug, error, info, warn};
 use serde_json::Value;
 use std::{collections::BTreeMap, path::PathBuf};
 
-use crate::{app_root, create_file, error::AppError, exists};
+use crate::{app_root, create_file, error::AppError, exists, get_tauri_conf};
 
 const CONF_NAME: &str = "conf.json";
 
@@ -24,7 +24,9 @@ pub struct AppConf {
     /// 是否开启反重复
     pub antiduble: bool,
     /// 上一次选择的sheet名
-    pub lastsheet: String
+    pub lastsheet: String,
+    /// 上次安装的版本
+    pub lastversion: semver::Version,
 }
 
 impl Default for AppConf {
@@ -35,7 +37,14 @@ impl Default for AppConf {
             cala_animation_speed: 40,
             cala_list: true,
             antiduble: true,
-            lastsheet: "".into()
+            lastsheet: "".into(),
+            lastversion: get_tauri_conf()
+                .unwrap()
+                .package
+                .version
+                .unwrap()
+                .parse()
+                .unwrap(),
         }
     }
 }
@@ -48,14 +57,15 @@ impl AppConf {
     }
 
     /// 返回配置文件路径
+    /// # Return
+    /// 返回PathBuf
     fn file_path() -> PathBuf {
         app_root().join(CONF_NAME)
     }
 
     /// 读取配置文件
-    ///
+    /// # Return
     /// 返回包含配置的 **AppConf** 对象
-    ///
     /// # Error
     /// 无法读取配置文件时将返回包含**默认配置**的 AppConf 对象
     pub fn read() -> Self {
@@ -122,9 +132,7 @@ impl AppConf {
         // 将json对象反序列化为self
         match serde_json::to_string_pretty(&config) {
             Ok(content) => match serde_json::from_str(&content) {
-                Ok(a) => {
-                    a
-                }
+                Ok(a) => a,
                 Err(err) => {
                     error!("config_modify_parse: {err}");
                     self

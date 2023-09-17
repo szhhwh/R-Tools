@@ -1,6 +1,6 @@
 [package]
 name = "rtools"
-version = "0.4.6"
+version = "0.5.0"
 description = "A box that provides some useful tools"
 authors = ["szhh"]
 license = ""
@@ -21,6 +21,7 @@ tauri-plugin-log = { git = "https://github.com/tauri-apps/plugins-workspace", br
 log = "0.4.19"
 anyhow = "1.0.71"
 calamine = "0.21.2"
+semver = "1.0.18"
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem

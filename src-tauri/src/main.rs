@@ -45,6 +45,7 @@ fn main() {
             cmd::save_config,
             cmd::close_splashscreen,
             cmd::return_sheet_names,
+            cmd::return_version
         ])
         .on_menu_event(menu::menu_handler)
         .menu(menu::init())

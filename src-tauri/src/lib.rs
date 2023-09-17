@@ -1,4 +1,5 @@
 use error::AppError;
+use tauri::Config;
 use std::{
     fs,
     path::{Path, PathBuf}, ffi::OsStr,
@@ -38,4 +39,14 @@ where
     }
     fs::File::create(filename)?;
     Ok(())
+}
+
+/// 读取tauri.conf.json
+/// 
+/// ## Return
+/// 返回 tauri::Config
+pub fn get_tauri_conf() -> Option<Config> {
+    let config_file = include_str!("../tauri.conf.json");
+    let config = serde_json::from_str(config_file).expect("failed to parse tauri.conf.json");
+    Some(config)
 }

@@ -10,18 +10,22 @@ function changeactive(newindex: string) {
 }
 
 provide('activeIndex', { activeIndex, changeactive })
-const router = useRouter()
 
+const router = useRouter()
 watch(router.currentRoute, () => {
-  if (router.currentRoute.value.path !== '/') {
+  if (router.currentRoute.value.path !== '/' && router.currentRoute.value.fullPath !== '/app/update_dialog') {
     backhome.value = true
   }
   else {
+    console.log(router.currentRoute.value.fullPath)
     backhome.value = false
   }
 })
 
 let backhome = ref<boolean>(false)
+
+// 关闭右键菜单
+document.addEventListener('contextmenu', e => e.preventDefault())
 </script>
 
 <template>

@@ -1,8 +1,8 @@
 use crate::app::readers::calareader;
 use log::{error, info};
-use rtools::conf::AppConf;
+use rtools::{conf::AppConf, get_tauri_conf};
 /// tauri命令模块
-use tauri::{command, AppHandle, Config, Manager};
+use tauri::{command, AppHandle, Manager};
 
 /// 关闭 splashscreen
 #[command]
@@ -41,13 +41,6 @@ pub fn return_config() -> Result<serde_json::Value, &'static str> {
     Ok(config)
 }
 
-/// 读取tauri.conf.json
-pub fn get_tauri_conf() -> Option<Config> {
-    let config_file = include_str!("../../tauri.conf.json");
-    let config = serde_json::from_str(config_file).expect("failed to parse tauri.conf.json");
-    Some(config)
-}
-
 /// 向前端返回工作簿中包含的表名称
 /// 
 /// 前端以**数组**的方式收到包含的值
@@ -60,5 +53,21 @@ pub fn return_sheet_names() -> serde_json::Value {
             error!("excel file path unavaliable");
             serde_json::Value::Null
         }
+    }
+}
+
+/// 向前端返回当前版本号
+/// # Return
+/// Strings
+#[command]
+pub fn return_version() -> Result<String, &'static str> {
+    match get_tauri_conf() {
+        Some(config) => {
+            match config.package.version {
+                Some(e) => Ok(e),
+                None => Err("Can't get application's version")
+            }
+        },
+        None => Err("Can't get application's version")
     }
 }
