@@ -1,7 +1,7 @@
 {
   "name": "r-tools",
   "private": true,
-  "version": "0.4.6",
+  "version": "0.5.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -15,11 +15,13 @@
     "@tauri-apps/api": "^1.4.0",
     "element-plus": "^2.3.7",
     "gsap": "^3.11.5",
+    "markdown-it": "^13.0.1",
     "vue": "^3.2.45",
     "vue-router": "^4.2.2"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^1.4.0",
+    "@types/markdown-it": "^13",
     "@types/node": "^18.7.10",
     "@vitejs/plugin-vue": "^4.0.0",
     "typescript": "^4.9.5",

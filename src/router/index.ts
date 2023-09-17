@@ -32,6 +32,17 @@ const router = createRouter({
           component: () => import('../components/random/CalaRand.vue')
         }
       ]
+    },
+    {
+      path: '/app',
+      name: 'app',
+      children: [
+        {
+          path: '/app/update_dialog',
+          name: 'update_dialog',
+          component: () => import('../views/UpdateDialog.vue')
+        }
+      ]
     }
   ]
 })

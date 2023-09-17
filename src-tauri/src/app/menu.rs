@@ -1,7 +1,8 @@
 use log::debug;
+use rtools::get_tauri_conf;
 use tauri::{CustomMenuItem, Manager, Menu, Submenu, WindowMenuEvent};
 
-use super::{cmd::get_tauri_conf, windows};
+use super::windows;
 
 pub fn init() -> Menu {
     // 设置菜单
@@ -13,13 +14,15 @@ pub fn init() -> Menu {
     // 帮助菜单
     let help = Submenu::new(
         "帮助",
-        Menu::new().add_item(CustomMenuItem::new("about", "关于")),
+        Menu::new()
+            .add_item(CustomMenuItem::new("about", "关于"))
+            .add_item(CustomMenuItem::new("update_dialog", "更新日志")),
     );
 
     Menu::new().add_submenu(help)
 }
 
-/// 菜单栏切换Handle
+/// 菜单栏切换钩子
 pub fn menu_handler(event: WindowMenuEvent<tauri::Wry>) {
     let win = Some(event.window()).unwrap();
     let app = win.app_handle();
@@ -38,11 +41,14 @@ pub fn menu_handler(event: WindowMenuEvent<tauri::Wry>) {
                 ),
             )
         }
+        "update_dialog" => {
+            debug!("open update_dialog window");
+            windows::cmd::update_dialog(app)
+        }
         "setting" => {
-            debug!("opening setting window");
+            debug!("open setting window");
             windows::cmd::setting_center(app, "".into())
         }
-        _ => {
-        }
+        _ => {}
     }
 }
