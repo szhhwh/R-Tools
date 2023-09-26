@@ -169,6 +169,8 @@ async function reset() {
     )
     // 关闭重置按钮
     resetbutton.value = true
+    // 打开抽取按钮
+    getbutton.value = false
 }
 
 // 确认重置界面框
