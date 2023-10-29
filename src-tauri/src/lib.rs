@@ -19,7 +19,7 @@ pub fn app_root() -> PathBuf {
 /// 判断传入的path是否存在
 ///
 /// ## Return
-/// 返回布尔值：为真时路径存在。
+/// 返回布尔值：为真时路径存在
 pub fn exists<P>(path: P) -> bool
 where P: AsRef<Path> + AsRef<OsStr>
 {
