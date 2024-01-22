@@ -9,7 +9,7 @@ import { ref, onMounted, inject, onUpdated, computed, watch } from 'vue'
 // element-plus
 import { Action, ElMessage, ElMessageBox, ElNotification } from 'element-plus'
 import { clipboard } from '@tauri-apps/api';
-import { Setting } from '@element-plus/icons';
+import { Setting } from '@element-plus/icons-vue';
 import { Check } from '@element-plus/icons-vue'
 
 // 引入全局配置

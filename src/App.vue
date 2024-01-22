@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { House } from '@element-plus/icons'
+import { House } from '@element-plus/icons-vue'
 import { provide, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 
