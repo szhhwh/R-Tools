@@ -99,16 +99,16 @@ impl AppConf {
                 Ok(_) => (),
                 Err(e) => return Err(e),
             }
-            info!("conf_create");
+            info!("config file created");
         }
         if let Ok(v) = serde_json::to_string(&self) {
-            debug!("Config context: {}", &v);
+            debug!("config context: {}", &v);
             std::fs::write(path, v).unwrap_or_else(|err| {
-                error!("conf_write: {}", err);
+                error!("config_write_err: {}", err);
                 Self::default().write().ok();
             });
         } else {
-            error!("conf_ser");
+            error!("config_ser");
         }
         Ok(self)
     }

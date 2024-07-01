@@ -27,17 +27,17 @@ where P: AsRef<Path> + AsRef<OsStr>
 }
 
 /// 创建文件
-pub fn create_file<P>(filename: P) -> Result<(), AppError>
+pub fn create_file<P>(filepath: P) -> Result<(), AppError>
 where
     P: AsRef<Path>,
 {
-    let filename = filename.as_ref();
-    if let Some(parent) = filename.parent() {
+    let file_path = filepath.as_ref();
+    if let Some(parent) = file_path.parent() {
         if !parent.exists() {
             fs::create_dir_all(parent)?;
         }
     }
-    fs::File::create(filename)?;
+    fs::File::create(file_path)?;
     Ok(())
 }
 
