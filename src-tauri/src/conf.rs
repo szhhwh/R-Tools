@@ -27,6 +27,10 @@ pub struct AppConf {
     pub lastsheet: String,
     /// 上次安装的版本
     pub lastversion: semver::Version,
+    /// 上次打开的界面
+    pub lastview: String,
+    /// 打开软件时是否打开上次关闭时的界面
+    pub lastviewselector: bool,
 }
 
 impl Default for AppConf {
@@ -45,6 +49,8 @@ impl Default for AppConf {
                 .unwrap()
                 .parse()
                 .unwrap(),
+            lastview: "home".into(),
+            lastviewselector: true
         }
     }
 }

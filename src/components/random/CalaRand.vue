@@ -16,7 +16,6 @@ import { Check } from '@element-plus/icons-vue'
 const { config, write_conf } = inject<any>('app_config')
 
 // 抽取显示开始
-// 
 const randnum_title = ref() // 抽取结果
 const randlist = ref() // 抽取结果列表
 
@@ -370,6 +369,12 @@ const handle_close = () => {
 
 // 初始化
 onMounted(() => {
+    // 写入最后打开的页面
+    let data_raw = JSON.stringify({
+        "lastview": "calarand"
+    })
+    let data = JSON.parse(data_raw)
+    write_conf(data, 'main')
     // 读取全局配置
     loadsettings()
     read_config()
@@ -412,7 +417,8 @@ onUpdated(() => {
             <el-button size="large" @click="getnum" :disabled="getbutton">抽取</el-button>
             <el-button size="large" @click="confirm_reset" :disabled="resetbutton">重置</el-button>
             <ElButton size="large" @click="copyresult">复制结果</ElButton>
-            <ElButton :icon="Setting" size="large" @click="() => { settingbox = true, cancel_lock = false }">设置</ElButton>
+            <ElButton :icon="Setting" size="large" @click="() => { settingbox = true, cancel_lock = false }">设置
+            </ElButton>
         </el-row>
     </div>
 

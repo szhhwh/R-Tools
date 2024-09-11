@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { inject } from 'vue';
-import { useRouter } from 'vue-router';
+import { inject, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 
 let cards = [
     {
@@ -8,18 +8,32 @@ let cards = [
         name: 'Calarand',
         label: 'CR',
         descript: '随机输出excel文件中的内容',
-        path: '/random/calarand'
+        path: '/random/calarand',
+        currentView: 'calarand'
     },
     {
         index: 2,
         name: 'TimeLapsephoto',
         label: 'TLP',
         descript: '用于延时摄影的计算器',
-        path: '/calculators/timeLapsephoto'
+        path: '/calculators/timeLapsephoto',
+        currentView: 'timeLapsephoto'
     }
 ]
 const router = useRouter()
-let { activeIndex, changeactive } = inject<any>('activeIndex')
+const { activeIndex, changeactive } = inject<any>('activeIndex')
+
+// 引入全局配置
+const { config, write_conf } = inject<any>('app_config')
+
+onMounted(() => {
+    // 写入最后打开的页面
+    let data_raw = JSON.stringify({
+    "lastview": "home"
+  })
+  let data = JSON.parse(data_raw)
+  write_conf(data, 'main')
+})
 </script>
 
 <template>
