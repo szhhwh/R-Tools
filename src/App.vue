@@ -13,13 +13,16 @@ function changeactive(newindex: string) {
 provide('activeIndex', { activeIndex, changeactive })
 
 const router = useRouter()
+// 通过监控当前router，显示返回首页按钮
 watch(router.currentRoute, () => {
-  if (router.currentRoute.value.path !== '/' && router.currentRoute.value.fullPath !== '/app/update_dialog') {
-    backhome.value = true
-  }
-  else {
-    console.log(router.currentRoute.value.fullPath)
-    backhome.value = false
+  switch (router.currentRoute.value.fullPath) {
+    case '/':
+    case '/app/setting_center':
+    case '/app/update_dialog':
+      backhome.value = false
+      break
+    default:
+      backhome.value = true
   }
 })
 
