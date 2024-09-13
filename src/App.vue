@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import { House } from '@element-plus/icons-vue'
-import { invoke } from '@tauri-apps/api';
-import { ElNotification } from 'element-plus';
 // Vue
-import { provide, ref, watch } from 'vue'
+import { inject, provide, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 let activeIndex = ref('/')
@@ -30,42 +28,28 @@ let backhome = ref<boolean>(false)
 // 关闭右键菜单
 document.addEventListener('contextmenu', e => e.preventDefault())
 
-// 读取配置文件并跳转至上次打开的页面
-const conf = ref()
-invoke('return_config').catch((err) => {
-  ElNotification({
-    title: '错误',
-    type: 'error',
-    message: err,
-    position: 'bottom-right'
+// 引入全局配置
+const { config, write_conf } = inject<any>('app_config')
+
+function backtohome() {
+  // 写入最后打开的页面
+  let data_raw = JSON.stringify({
+    "lastview": "/"
   })
-}).then((v) => { // 根据配置文件中保存的界面进行跳转
-  conf.value = v
-  console.log(conf.value.lastviewselector)
-  // 逐个情况匹配
-  if (conf.value.lastviewselector == true) {
-    switch (conf.value.lastview) {
-      case
-        'calarand': router.push('/random/calarand')
-        break
-      case
-        'timeLapsephoto': router.push('/calculators/timeLapsephoto')
-        break
-      default:
-        router.push('/')
-    }
-  }
-})
+  let data = JSON.parse(data_raw)
+  write_conf(data, 'main')
+}
 </script>
 
 <template>
   <el-container>
-    <el-button v-show="backhome" @click="() => { router.push('/') }" :icon="House" id="backhome">返回首页</el-button>
+    <el-button v-show="backhome" @click="() => { backtohome(); router.push('/') }" :icon="House"
+      id="backhome">返回首页</el-button>
     <el-main class="main">
       <router-view v-slot="{ Component }">
-        <!-- <keep-alive> -->
+        <keep-alive>
         <component :is="Component"></component>
-        <!-- </keep-alive> -->
+        </keep-alive>
       </router-view>
     </el-main>
   </el-container>

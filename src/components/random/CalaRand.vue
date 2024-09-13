@@ -371,7 +371,7 @@ const handle_close = () => {
 onMounted(() => {
     // 写入最后打开的页面
     let data_raw = JSON.stringify({
-        "lastview": "calarand"
+        "lastview": "/random/calarand"
     })
     let data = JSON.parse(data_raw)
     write_conf(data, 'main')

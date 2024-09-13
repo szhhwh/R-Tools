@@ -1,18 +1,23 @@
 use crate::app::readers::calareader;
-use log::{error, info};
+use log::{debug, error, info};
 use rtools::{conf::AppConf, get_tauri_conf};
 /// tauri命令模块
 use tauri::{command, AppHandle, Manager};
 
 /// 关闭 splashscreen
 #[command]
-pub fn close_splashscreen(window: tauri::Window) {
+pub async fn close_splashscreen(window: tauri::Window) {
     // Close splashscreen
     if let Some(splashscreen) = window.get_window("splashscreen") {
         splashscreen.close().unwrap();
     }
     // Show main window
     window.get_window("main").unwrap().show().unwrap();
+    // 根据上一次打开的页面进行跳转
+    let app_config = AppConf::read();
+    if app_config.lastviewselector {
+        window.emit_to("main", "Appstart", app_config.lastview).unwrap();
+    }
 }
 
 /// 保存配置文件

@@ -7,7 +7,7 @@ const { config, write_conf } = inject<any>('app_config')
 onMounted(() => {
     // 写入最后打开的页面
     let data_raw = JSON.stringify({
-    "lastview": "timeLapsephoto"
+    "lastview": "/calculators/timeLapsephoto"
   })
   let data = JSON.parse(data_raw)
   write_conf(data, 'main')

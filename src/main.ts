@@ -9,6 +9,12 @@ import 'element-plus/dist/index.css'
 import { ElNotification } from 'element-plus'
 // 注册 Element icons
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
+import { listen } from "@tauri-apps/api/event"
+
+listen("Appstart", (event: any) => {
+  console.log(event)
+  router.push(event.payload)
+})
 
 // splashscreen
 document.addEventListener('DOMContentLoaded', () => {
@@ -36,14 +42,14 @@ async function get_config() {
   })
 }
 
-// 写入配置
+// 从后端拉取一次配置
+get_config()
+
+// 全局配置写入函数
 async function write_conf(data: JSON, label: String) {
   await invoke('save_config', { data: data, label: label })
   await get_config()
 }
-
-// 从后端拉取配置
-get_config()
 
 // vue_plugins_load
 app.use(ElementPlus)

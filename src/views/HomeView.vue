@@ -9,7 +9,6 @@ let cards = [
         label: 'CR',
         descript: '随机输出excel文件中的内容',
         path: '/random/calarand',
-        currentView: 'calarand'
     },
     {
         index: 2,
@@ -17,7 +16,6 @@ let cards = [
         label: 'TLP',
         descript: '用于延时摄影的计算器',
         path: '/calculators/timeLapsephoto',
-        currentView: 'timeLapsephoto'
     }
 ]
 const router = useRouter()
@@ -26,14 +24,14 @@ const { activeIndex, changeactive } = inject<any>('activeIndex')
 // 引入全局配置
 const { config, write_conf } = inject<any>('app_config')
 
-onMounted(() => {
+function writelastview(view: string) {
     // 写入最后打开的页面
     let data_raw = JSON.stringify({
-    "lastview": "home"
+    "lastview": view
   })
-  let data = JSON.parse(data_raw)
-  write_conf(data, 'main')
-})
+    let data = JSON.parse(data_raw)
+    write_conf(data, 'main')
+}
 </script>
 
 <template>
@@ -46,7 +44,7 @@ onMounted(() => {
                             <span>{{ item.name }}</span>
                             <div class="flex"></div>
                             <el-button text bg
-                                @click="() => { router.push(item.path); changeactive(item.path) }">进入工具</el-button>
+                                @click="() => { router.push(item.path); changeactive(item.path); writelastview(item.path) }">进入工具</el-button>
                         </div>
                     </template>
                     <p>{{ item.descript }}</p>

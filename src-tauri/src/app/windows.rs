@@ -5,11 +5,11 @@ pub mod cmd {
     /// # Return
     /// None
     #[tauri::command]
-    pub fn setting_center(handle: tauri::AppHandle, _win_type: String) {
+    pub fn setting_center(handle: tauri::AppHandle) {
         tauri::async_runtime::spawn(async move {
             if handle.get_window("setting").is_none() {
-                WindowBuilder::new(&handle, "setting", WindowUrl::App("index.html".into()))
-                    .title("Setting")
+                WindowBuilder::new(&handle, "setting", WindowUrl::App("/app/setting_center".into()))
+                    .title("首选项")
                     .resizable(true)
                     .fullscreen(false)
                     .build()

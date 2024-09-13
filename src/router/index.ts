@@ -41,6 +41,11 @@ const router = createRouter({
           path: '/app/update_dialog',
           name: 'update_dialog',
           component: () => import('../views/UpdateDialog.vue')
+        },
+        {
+          path: '/app/setting_center',
+          name: 'setting_center',
+          component: () => import('../views/SettingView.vue')
         }
       ]
     }

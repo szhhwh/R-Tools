@@ -8,6 +8,7 @@ pub fn init(_app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     // 初始化配置文件
     let _init_config = AppConf::read().write();
 
+    // 读取软件版本
     let package_version = get_tauri_conf().unwrap().package.version.unwrap();
     info!("package version: {}", &package_version);
     let current_version = semver::Version::parse(package_version.as_str()).unwrap();
