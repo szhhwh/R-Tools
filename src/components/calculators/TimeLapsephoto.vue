@@ -1,18 +1,6 @@
 <script lang="ts" setup>
 import { ref, computed, inject, onMounted } from 'vue'
 
-// 引入全局配置
-const { config, write_conf } = inject<any>('app_config')
-
-onMounted(() => {
-    // 写入最后打开的页面
-    let data_raw = JSON.stringify({
-    "lastview": "timeLapsephoto"
-  })
-  let data = JSON.parse(data_raw)
-  write_conf(data, 'main')
-})
-
 // 计算锁定
 const enum Changed {
     videotime,

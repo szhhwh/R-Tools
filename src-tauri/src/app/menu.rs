@@ -5,16 +5,12 @@ use tauri::{CustomMenuItem, Manager, Menu, Submenu, WindowMenuEvent};
 use super::windows;
 
 pub fn init() -> Menu {
-    // 设置菜单
-    // let preferences_menu = Submenu::new(
-    //     "设置",
-    //     Menu::new().add_item(CustomMenuItem::new("setting", "首选项")),
-    // );
-
     // 帮助菜单
     let help = Submenu::new(
         "帮助",
         Menu::new()
+            .add_item(CustomMenuItem::new("setting", "首选项"))
+            .add_native_item(tauri::MenuItem::Separator)
             .add_item(CustomMenuItem::new("about", "关于"))
             .add_item(CustomMenuItem::new("update_dialog", "更新日志")),
     );
@@ -47,7 +43,7 @@ pub fn menu_handler(event: WindowMenuEvent<tauri::Wry>) {
         }
         "setting" => {
             debug!("open setting window");
-            windows::cmd::setting_center(app, "".into())
+            windows::cmd::setting_center(app)
         }
         _ => {}
     }

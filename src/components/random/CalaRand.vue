@@ -369,12 +369,6 @@ const handle_close = () => {
 
 // 初始化
 onMounted(() => {
-    // 写入最后打开的页面
-    let data_raw = JSON.stringify({
-        "lastview": "calarand"
-    })
-    let data = JSON.parse(data_raw)
-    write_conf(data, 'main')
     // 读取全局配置
     loadsettings()
     read_config()
