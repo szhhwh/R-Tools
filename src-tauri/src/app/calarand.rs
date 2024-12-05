@@ -48,7 +48,7 @@ fn rand(times: u32) -> Result<(), AppError> {
     let mut record = RECORD.lock().unwrap();
     let list = LIST.lock().unwrap();
 
-    if config.antiduble == true {
+    if config.antidouble == true {
         // counter 计数器
         let mut count: u32 = 0;
         // 判断record是否为空，空数组则添加一个随机数
@@ -83,7 +83,7 @@ fn rand(times: u32) -> Result<(), AppError> {
         } else if list.len() == record.len() {
             return Err(AppError::Err("列表抽取完毕".into()));
         }
-    } else if config.antiduble == false {
+    } else if config.antidouble == false {
         for _i in 1..=times {
             record.push(rand::thread_rng().gen_range(0..list.len()));
         }

@@ -22,7 +22,7 @@ pub struct AppConf {
     pub cala_animation_speed: i32,
     pub cala_list: bool,
     /// 是否开启反重复
-    pub antiduble: bool,
+    pub antidouble: bool,
     /// 上一次选择的sheet名
     pub lastsheet: String,
     /// 上次安装的版本
@@ -40,7 +40,7 @@ impl Default for AppConf {
             cala_animation: true,
             cala_animation_speed: 40,
             cala_list: true,
-            antiduble: true,
+            antidouble: true,
             lastsheet: "".into(),
             lastversion: get_tauri_conf()
                 .unwrap()
