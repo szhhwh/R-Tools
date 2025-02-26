@@ -7,6 +7,7 @@ use std::path::Path;
 
 #[derive(Default)]
 pub struct CALA<P: AsRef<Path>> {
+    #[allow(dead_code)]
     pub file_path: P,
     pub content: HashMap<usize, String>,
 }
