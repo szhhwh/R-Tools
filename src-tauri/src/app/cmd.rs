@@ -1,5 +1,5 @@
 use crate::app::readers::calareader;
-use log::{debug, error, info};
+use log::{error, info};
 use rtools::{conf::AppConf, get_tauri_conf};
 /// tauri命令模块
 use tauri::{command, AppHandle, Manager};
