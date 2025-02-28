@@ -16,6 +16,13 @@ let cards = [
         label: 'TLP',
         descript: '用于延时摄影的计算器',
         path: '/calculators/timeLapsephoto',
+    },
+    {
+        index: 3,
+        name: 'PhysicalExp',
+        label: 'PE',
+        descript: '物理实验数据处理',
+        path: '/calculators/physicalexp',
     }
 ]
 const router = useRouter()

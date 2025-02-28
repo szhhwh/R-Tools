@@ -11,7 +11,7 @@ use tauri_plugin_log::{
 };
 
 mod app;
-use app::{calarand, cmd, menu, setup};
+use app::{calarand, cmd, menu, setup, physicalcalc};
 
 fn main() {
     let mut log = tauri_plugin_log::Builder::default()
@@ -45,7 +45,8 @@ fn main() {
             cmd::save_config,
             cmd::close_splashscreen,
             cmd::return_sheet_names,
-            cmd::return_version
+            cmd::return_version,
+            physicalcalc::compute
         ])
         .on_menu_event(menu::menu_handler)
         .menu(menu::init())

@@ -4,3 +4,4 @@ pub mod readers;
 pub mod cmd;
 pub mod menu;
 pub mod windows;
+pub mod physicalcalc;

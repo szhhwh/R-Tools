@@ -19,6 +19,11 @@ const router = createRouter({
           name: 'timeLapsephoto',
           component: () => import('../components/calculators/TimeLapsephoto.vue')
         },
+        {
+          path: '/calculators/physicalexp',
+          name: 'physicalexp',
+          component: () => import('../components/calculators/PhysicalExp.vue')
+        }
       ]
     },
     {
