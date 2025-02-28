@@ -1,7 +1,6 @@
 use crate::app::readers::calareader;
 use log::{error, info};
 use rtools::{conf::AppConf, get_tauri_conf};
-/// tauri命令模块
 use tauri::{command, AppHandle, Manager};
 
 /// 关闭 splashscreen
@@ -50,13 +49,13 @@ pub fn return_config() -> Result<serde_json::Value, &'static str> {
 /// 
 /// 前端以**数组**的方式收到包含的值
 #[command]
-pub fn return_sheet_names() -> serde_json::Value {
+pub fn return_sheet_names() -> Result<serde_json::Value, &'static str> {
     let config = AppConf::read();
     match calareader::CALA::sheet_names(config.cala_path) {
-        Ok(v) => v,
+        Ok(v) => Ok(v),
         Err(_) => {
-            error!("excel file path unavaliable");
-            serde_json::Value::Null
+            error!("Excel file path is unavaliable");
+            Err("Excel file path is unavaliable")
         }
     }
 }
