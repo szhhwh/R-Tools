@@ -4,7 +4,7 @@ use thiserror::Error;
 #[derive(Debug, Error)]
 pub enum AppError {
     #[error("{0}")]
-    Err(String),
+    Err(&'static str),
     #[error("stdIOError: ")]
     IO(#[from] std::io::Error),
     #[error("JsonError: ")]
@@ -15,10 +15,4 @@ pub enum AppError {
     XlsxError(#[from] XlsxError),
     #[error("XlsError: ")]
     XlsError(#[from] XlsError),
-}
-
-impl From<String> for AppError {
-    fn from(s: String) -> Self {
-        AppError::Err(s)
-    }
 }
