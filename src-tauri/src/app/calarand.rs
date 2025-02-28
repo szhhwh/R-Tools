@@ -93,7 +93,7 @@ fn rand(times: u32) -> Result<(), AppError> {
 
 #[command]
 /// 生成随机数
-pub fn generate_randnum(times: u32, app_handle: tauri::AppHandle) -> Result<(), String> {
+pub fn generate_randnum(times: u32, app_handle: tauri::AppHandle) -> Result<(), &'static str> {
     match rand(times) {
         Ok(_) => (),
         Err(e) => {

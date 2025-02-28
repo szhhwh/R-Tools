@@ -9,8 +9,7 @@ import { ref, onMounted, inject, onUpdated, computed, watch } from 'vue'
 // element-plus
 import { Action, ElMessage, ElMessageBox, ElNotification } from 'element-plus'
 import { clipboard } from '@tauri-apps/api';
-import { Setting } from '@element-plus/icons-vue';
-import { Check } from '@element-plus/icons-vue'
+import { Setting, Check, CopyDocument, RefreshRight, Select } from '@element-plus/icons-vue'
 
 // 引入全局配置
 const { config, write_conf } = inject<any>('app_config')
@@ -388,103 +387,413 @@ onUpdated(() => {
 </script>
 
 <template>
-    <div class="main">
-        <el-row justify="center">
-            <el-col>
-                <p id="t-out">{{ title_display }}</p>
-            </el-col>
-            <el-col>
-                <Transition>
-                    <p v-if="Taggles.cala_list" id="l-out">{{ list_display }}</p>
-                </Transition>
-            </el-col>
-        </el-row>
-        <el-row justify="center">
-            <el-col>
-                <el-text>抽取次数</el-text>
-            </el-col>
-            <el-col :span="12">
-                <el-slider v-model="times" show-input :min="1" :max="max" />
-            </el-col>
-        </el-row>
-        <el-row justify="center">
-            <el-button size="large" @click="getnum" :disabled="getbutton">抽取</el-button>
-            <el-button size="large" @click="confirm_reset" :disabled="resetbutton">重置</el-button>
-            <ElButton size="large" @click="copyresult">复制结果</ElButton>
-            <ElButton :icon="Setting" size="large" @click="() => { settingbox = true, cancel_lock = false }">设置
-            </ElButton>
-        </el-row>
-    </div>
+  <div class="cala-rand-container">
+    <el-card class="app-card main-card" shadow="hover">
+      <template #header>
+        <div class="card-header">
+          <el-icon class="header-icon"><Select /></el-icon>
+          <span>随机抽取</span>
+        </div>
+      </template>
+      
+      <div class="result-display">
+        <transition name="slide-fade">
+          <p id="t-out">{{ title_display }}</p>
+        </transition>
+        
+        <transition name="fade">
+          <p v-if="Taggles.cala_list" id="l-out">{{ list_display }}</p>
+        </transition>
+      </div>
+      
+      <el-divider />
+      
+      <div class="control-panel">
+        <div class="slider-container">
+          <el-text class="slider-label">抽取次数</el-text>
+          <el-slider 
+            v-model="times" 
+            show-input 
+            :min="1" 
+            :max="max" 
+            class="times-slider"
+          />
+        </div>
+        
+        <div class="action-buttons">
+          <el-button 
+            type="primary" 
+            size="large" 
+            @click="getnum" 
+            :disabled="getbutton"
+            class="action-button"
+          >
+            <el-icon><Select /></el-icon>
+            抽取
+          </el-button>
+          
+          <el-button 
+            type="warning" 
+            size="large" 
+            @click="confirm_reset" 
+            :disabled="resetbutton"
+            class="action-button"
+          >
+            <el-icon><RefreshRight /></el-icon>
+            重置
+          </el-button>
+          
+          <el-button 
+            size="large" 
+            @click="copyresult"
+            class="action-button"
+          >
+            <el-icon><CopyDocument /></el-icon>
+            复制结果
+          </el-button>
+          
+          <el-button 
+            size="large" 
+            @click="() => { settingbox = true, cancel_lock = false }"
+            class="action-button"
+          >
+            <el-icon><Setting /></el-icon>
+            设置
+          </el-button>
+        </div>
+      </div>
+    </el-card>
 
-    <ElDrawer v-model="settingbox" title="Cala 随机设置" size="80%" :before-close="handle_close">
-        <el-form :model="form">
+    <el-drawer
+      v-model="settingbox"
+      title="抽取设置"
+      size="80%"
+      :before-close="handle_close"
+      class="settings-drawer"
+      destroy-on-close
+    >
+      <el-card class="settings-card" shadow="never">
+        <template #header>
+          <div class="card-header">
+            <el-icon class="header-icon"><Setting /></el-icon>
+            <span>Cala 随机设置</span>
+          </div>
+        </template>
+        
+        <el-form :model="form" label-position="top">
+          <div class="form-section">
+            <h4 class="section-title">Excel 文件设置</h4>
+            
             <el-form-item>
-                <el-input placeholder="excel file path" v-model="form.cala_path" disabled>
-                    <template #prepend>excel 文件路径</template>
-                </el-input>
+              <el-input 
+                placeholder="excel file path" 
+                v-model="form.cala_path" 
+                disabled
+                class="path-input"
+              >
+                <template #prepend>excel 文件路径</template>
+              </el-input>
             </el-form-item>
-            <ElFormItem>
-                <el-button type="primary" :icon="Check" @click="reload_excel_path">选择 Excel 工作簿</el-button>
-            </ElFormItem>
-            <ElFormItem label="列表显示">
-                <el-switch v-model="form.cala_list" active-text="打开" inactive-text="关闭"></el-switch>
-            </ElFormItem>
-            <ElFormItem label="抽取结果唯一化">
-                <el-switch v-model="form.antiduble" active-text="是" inactive-text="否"></el-switch>
-            </ElFormItem>
-            <ElFormItem label="抽取动画">
-                <el-switch v-model="form.cala_animation" active-text="打开" inactive-text="关闭"></el-switch>
-            </ElFormItem>
-            <ElFormItem label="动画速度">
-                <ElSelect v-model="form.cala_animation_speed">
-                    <ElOption v-for="item in speedoption" :key="item.value" :label="item.label" :value="item.value">
-                    </ElOption>
-                </ElSelect>
-            </ElFormItem>
-            <ElFormItem label="选择读取的表">
-                <ElSelect v-model="form.lastsheet" :no-data-text="'无可用的表'" :placeholder="'表名称（默认使用第一个表）'">
-                    <ElOption v-for="item in tablename" :key="item.value" :label="item.label" :value="item.label">
-                    </ElOption>
-                </ElSelect>
-            </ElFormItem>
-            <ElFormItem>
-                <ElButton @click="get_sheet_names">重新加载表名称</ElButton>
-            </ElFormItem>
+            
+            <el-form-item>
+              <el-button 
+                type="primary" 
+                :icon="Check" 
+                @click="reload_excel_path"
+                class="select-file-btn"
+              >
+                选择 Excel 工作簿
+              </el-button>
+            </el-form-item>
+            
+            <el-form-item label="选择读取的表">
+              <div class="sheet-selection">
+                <el-select 
+                  v-model="form.lastsheet" 
+                  :no-data-text="'无可用的表'" 
+                  :placeholder="'表名称（默认使用第一个表）'"
+                  class="sheet-select"
+                >
+                  <el-option 
+                    v-for="item in tablename" 
+                    :key="item.value" 
+                    :label="item.label" 
+                    :value="item.label"
+                  />
+                </el-select>
+                
+                <el-button 
+                  @click="get_sheet_names"
+                  class="reload-btn"
+                >
+                  重新加载表名称
+                </el-button>
+              </div>
+            </el-form-item>
+          </div>
+          
+          <div class="form-section">
+            <h4 class="section-title">显示设置</h4>
+            
+            <el-form-item label="列表显示" class="switch-item">
+              <el-switch 
+                v-model="form.cala_list" 
+                active-text="打开" 
+                inactive-text="关闭"
+              />
+            </el-form-item>
+            
+            <el-form-item label="抽取结果唯一化" class="switch-item">
+              <el-switch 
+                v-model="form.antiduble" 
+                active-text="是" 
+                inactive-text="否"
+              />
+            </el-form-item>
+          </div>
+          
+          <div class="form-section">
+            <h4 class="section-title">动画设置</h4>
+            
+            <el-form-item label="抽取动画" class="switch-item">
+              <el-switch 
+                v-model="form.cala_animation" 
+                active-text="打开" 
+                inactive-text="关闭"
+              />
+            </el-form-item>
+            
+            <el-form-item label="动画速度">
+              <el-select v-model="form.cala_animation_speed" class="speed-select">
+                <el-option 
+                  v-for="item in speedoption" 
+                  :key="item.value" 
+                  :label="item.label" 
+                  :value="item.value"
+                />
+              </el-select>
+            </el-form-item>
+          </div>
         </el-form>
-    </ElDrawer>
+      </el-card>
+    </el-drawer>
+  </div>
 </template>
 
 <style scoped>
-.main {
-    flex-direction: column;
-    justify-content: center;
-    text-align: center;
+.cala-rand-container {
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.app-card {
+  margin-bottom: 20px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.main-card {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.header-icon {
+  margin-right: 8px;
+  font-size: 18px;
+  color: var(--el-color-primary);
+}
+
+.result-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 10px;
+  background-color: var(--el-fill-color-light);
+  border-radius: 8px;
+  margin-bottom: 20px;
+  min-height: 200px;
+  transition: all 0.3s;
 }
 
 #t-out {
-    font-size: calc(10vmin);
+  font-size: min(10vmin, 60px);
+  font-weight: 600;
+  color: var(--el-color-primary);
+  margin-bottom: 16px;
+  text-align: center;
 }
 
 #l-out {
-    font-size: calc(2.5vmin);
+  font-size: min(2.5vmin, 18px);
+  color: var(--el-text-color-primary);
+  text-align: center;
+  max-width: 100%;
+  overflow-wrap: break-word;
+  word-break: break-all;
 }
 
-/* Animation Start */
-.v-enter-active,
-.v-leave-active {
-    transition: opacity 0.3s ease;
+.control-panel {
+  padding: 10px;
 }
 
-.v-enter-from,
-.v-leave-to {
-    opacity: 0;
+.slider-container {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-/* Animation End */
+.slider-label {
+  font-size: 14px;
+  color: var(--el-text-color-regular);
+  margin-bottom: 4px;
+}
 
-/* 段落自动换行 */
-p {
-    word-wrap: break-word;
-    word-break: break-all;
+.times-slider {
+  margin: 0 auto;
+  width: 95%;
+}
+
+.action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.action-button {
+  flex: 1;
+  min-width: 120px;
+  max-width: 200px;
+  padding: 12px 20px;
+  transition: all 0.3s ease;
+}
+
+.action-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 设置抽屉样式 */
+.settings-drawer :deep(.el-drawer__header) {
+  margin-bottom: 0;
+  padding: 16px;
+  border-bottom: 1px solid var(--el-border-color-light);
+}
+
+.settings-drawer :deep(.el-drawer__body) {
+  padding: 0;
+}
+
+.settings-card {
+  border: none;
+  box-shadow: none;
+}
+
+.form-section {
+  margin-bottom: 24px;
+  padding: 16px;
+  background-color: var(--el-fill-color-light);
+  border-radius: 8px;
+}
+
+.section-title {
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-size: 16px;
+  color: var(--el-text-color-primary);
+  font-weight: 500;
+}
+
+.path-input {
+  width: 100%;
+}
+
+.select-file-btn {
+  width: 100%;
+  margin-bottom: 10px;
+  transition: all 0.2s ease;
+}
+
+.select-file-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(var(--el-color-primary-rgb), 0.4);
+}
+
+.sheet-selection {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.sheet-select {
+  flex: 3;
+  min-width: 200px;
+}
+
+.reload-btn {
+  flex: 1;
+  min-width: 120px;
+}
+
+.switch-item {
+  margin-bottom: 16px;
+}
+
+.speed-select {
+  width: 100%;
+}
+
+/* 动画效果 */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.slide-fade-enter-active {
+  transition: all 0.3s ease-out;
+}
+
+.slide-fade-leave-active {
+  transition: all 0.3s ease-in;
+}
+
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  transform: translateY(20px);
+  opacity: 0;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .action-buttons {
+    flex-direction: column;
+  }
+  
+  .action-button {
+    max-width: none;
+  }
+  
+  .sheet-selection {
+    flex-direction: column;
+  }
+  
+  .sheet-select,
+  .reload-btn {
+    width: 100%;
+  }
 }
 </style>
